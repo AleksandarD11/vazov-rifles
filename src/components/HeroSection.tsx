@@ -1,47 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Crosshair } from "lucide-react";
 import ReservationDialog from "./ReservationDialog";
 
 const HeroSection = () => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [title, setTitle] = useState("ИЗГРАДИ СВОЯ ПЕРФЕКТЕН АРСЕНАЛ");
+  const [subtitle, setSubtitle] = useState("Професионален тунинг и ремонт на еърсофт реплики");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase.from("site_settings").select("*");
+      if (data) {
+        const hTitle = data.find(s => s.key === "hero_title")?.value;
+        const hSub = data.find(s => s.key === "hero_subtitle")?.value;
+        if (hTitle) setTitle(hTitle);
+        if (hSub) setSubtitle(hSub);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   return (
-    <>
-      <section id="начало" className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src="/images/hero.jpg"
-            alt="Елегантен интериор на ресторант LUXOR"
-            className="w-full h-full object-cover"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-primary/70" />
-        </div>
+    <section id="home" className="relative min-h-screen flex items-center justify-center bg-[#040404] overflow-hidden">
+      {/* Background with Dark Cinematic Overlay */}
+      <div className="absolute inset-0 z-0">
+         <div className="absolute inset-0 bg-gradient-to-b from-[#040404] via-[#040404]/80 to-[#040404] z-10" />
+         <img src="/placeholder.svg" alt="Airsoft background" className="w-full h-full object-cover opacity-20 scale-105 animate-pulse duration-[10000ms]" />
+      </div>
 
-        <div className="relative z-10 container text-center px-4">
-          <p className="text-gold font-body tracking-[0.3em] uppercase text-sm mb-4 animate-fade-in-up">
-            Ресторант LUXOR
-          </p>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-primary-foreground leading-tight mb-6 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-            Съчетание на елегантност<br className="hidden md:block" /> и уют.
-          </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/80 font-body font-light max-w-2xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-            Перфектното място за вашите специални поводи.
-          </p>
-          <div className="animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-            <Button
-              size="lg"
-              className="bg-gold hover:bg-gold-dark text-primary font-body tracking-wider uppercase text-sm px-10 py-6"
-              onClick={() => setDialogOpen(true)}
-            >
-              Резервирай маса
-            </Button>
-          </div>
+      <div className="container mx-auto px-4 relative z-20 text-center animate-in fade-in zoom-in duration-1000">
+        <div className="inline-block p-4 rounded-full border border-gold/20 bg-gold/5 mb-8 backdrop-blur-sm">
+           <Crosshair className="text-gold w-16 h-16" strokeWidth={1} />
         </div>
-      </section>
+        
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-display font-bold text-white uppercase tracking-[0.15em] mb-8 leading-tight drop-shadow-2xl">
+          {title}
+        </h1>
+        
+        <div className="w-24 h-1 bg-gold mx-auto mb-10 rounded-full" />
+        
+        <p className="text-lg md:text-xl text-gray-400 max-w-3xl mx-auto uppercase tracking-[0.2em] mb-14 leading-relaxed font-light">
+          {subtitle}
+        </p>
+        
+        <Button 
+          onClick={() => setIsDialogOpen(true)} 
+          className="bg-gold text-black px-12 py-8 text-lg font-bold uppercase tracking-widest hover:bg-amber-400 hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-300 border-2 border-transparent hover:border-gold/50"
+        >
+          Заяви Сервиз
+        </Button>
 
-      <ReservationDialog open={dialogOpen} onOpenChange={setDialogOpen} />
-    </>
+        <ReservationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      </div>
+    </section>
   );
 };
 

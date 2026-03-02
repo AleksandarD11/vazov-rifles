@@ -17,36 +17,33 @@ export type Database = {
       reservations: {
         Row: {
           created_at: string
+          date: string
           guests: number
           id: string
           name: string
-          notes: string | null
           phone: string
-          reservation_date: string
-          reservation_time: string
           status: string
+          time: string
         }
         Insert: {
           created_at?: string
+          date: string
           guests: number
           id?: string
           name: string
-          notes?: string | null
           phone: string
-          reservation_date: string
-          reservation_time: string
           status?: string
+          time: string
         }
         Update: {
           created_at?: string
+          date?: string
           guests?: number
           id?: string
           name?: string
-          notes?: string | null
           phone?: string
-          reservation_date?: string
-          reservation_time?: string
           status?: string
+          time?: string
         }
         Relationships: []
       }

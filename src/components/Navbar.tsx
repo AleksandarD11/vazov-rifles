@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ReservationDialog from "./ReservationDialog";
+import ReservationDialog from "./ReservationDialog"; // Засега го оставяме така, после ще го прекръстим на OrderDialog
 
 const navLinks = [
   { label: "Начало", href: "#начало" },
-  { label: "Меню", href: "#меню" },
-  { label: "Галерия", href: "#галерия" },
-  { label: "Детски кът", href: "#детски-кът" },
+  { label: "Арсенал", href: "#арсенал" },
+  { label: "Тунинг", href: "#тунинг" },
+  { label: "В действие", href: "#в-действие" },
   { label: "Контакти", href: "#контакти" },
 ];
 
@@ -17,35 +17,35 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-primary/95 backdrop-blur-md border-b border-gold/20">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-[#e63946]/20">
         <div className="container flex items-center justify-between h-16 md:h-20">
-          <a href="#начало" className="text-2xl md:text-3xl font-display font-bold tracking-[0.2em] text-gold">
-            LUXOR
+          <a href="#начало" className="text-2xl md:text-3xl font-display font-bold tracking-[0.2em] text-[#e63946] uppercase">
+            Vazov Rifles
           </a>
 
           {/* Desktop links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-body font-medium tracking-wider text-primary-foreground/80 hover:text-gold transition-colors uppercase"
+                className="text-sm font-body font-bold tracking-widest text-gray-300 uppercase px-4 py-2 rounded-md transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-[#e63946]/10 hover:text-[#e63946]"
               >
                 {link.label}
               </a>
             ))}
             <Button
               variant="outline"
-              className="border-gold text-gold hover:bg-gold hover:text-primary font-body tracking-wider uppercase text-xs px-6"
+              className="ml-4 border-[#e63946] text-[#e63946] bg-transparent font-body tracking-widest uppercase text-xs px-6 transition-all duration-300 ease-out hover:-translate-y-1 hover:bg-[#e63946] hover:text-white hover:shadow-[0_0_15px_rgba(230,57,70,0.5)]"
               onClick={() => setDialogOpen(true)}
             >
-              Резервирай маса
+              Направи поръчка
             </Button>
           </div>
 
           {/* Mobile toggle */}
           <button
-            className="md:hidden text-primary-foreground"
+            className="md:hidden text-gray-300 hover:text-[#e63946] transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -55,13 +55,13 @@ const Navbar = () => {
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden bg-primary border-t border-gold/20 py-4">
-            <div className="container flex flex-col gap-4">
+          <div className="md:hidden bg-[#0a0a0a] border-t border-[#e63946]/20 py-4">
+            <div className="container flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-body tracking-wider text-primary-foreground/80 hover:text-gold transition-colors uppercase py-2"
+                  className="text-sm font-body tracking-widest text-gray-300 uppercase px-4 py-2 rounded-md transition-all duration-300 ease-out hover:bg-[#e63946]/10 hover:text-[#e63946] w-fit"
                   onClick={() => setMobileOpen(false)}
                 >
                   {link.label}
@@ -69,13 +69,13 @@ const Navbar = () => {
               ))}
               <Button
                 variant="outline"
-                className="border-gold text-gold hover:bg-gold hover:text-primary font-body tracking-wider uppercase text-xs w-fit"
+                className="mt-2 border-[#e63946] text-[#e63946] bg-transparent font-body tracking-widest uppercase text-xs px-6 transition-all duration-300 ease-out hover:bg-[#e63946] hover:text-white hover:shadow-[0_0_15px_rgba(230,57,70,0.5)] w-fit"
                 onClick={() => {
                   setDialogOpen(true);
                   setMobileOpen(false);
                 }}
               >
-                Резервирай маса
+                Направи поръчка
               </Button>
             </div>
           </div>

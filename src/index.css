@@ -4,54 +4,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ДОБАВЕН КОД: Мазно скролиране за навигацията */
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   :root {
-    --background: 30 10% 97%;
-    --foreground: 220 15% 13%;
+    /* Vazov Rifles Theme: Carbon Black background, White text, Hazard Red accents */
+    --background: 0 0% 4%; 
+    --foreground: 0 0% 100%;
 
-    --card: 30 15% 95%;
-    --card-foreground: 220 15% 13%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 30 10% 97%;
-    --popover-foreground: 220 15% 13%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 220 15% 13%;
-    --primary-foreground: 40 30% 95%;
+    /* Primary = Carbon Black; foreground = white */
+    --primary: 0 0% 4%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 30 10% 92%;
-    --secondary-foreground: 220 15% 13%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 30 10% 92%;
-    --muted-foreground: 220 10% 45%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 70%;
 
-    --accent: 38 65% 50%;
-    --accent-foreground: 30 10% 97%;
+    /* Accent / Hazard Red for headings, buttons */
+    --accent: 353 78% 56%; 
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 15% 88%;
-    --input: 30 15% 88%;
-    --ring: 38 65% 50%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 353 78% 56%;
 
     --radius: 0.5rem;
 
-    --gold: 38 65% 50%;
-    --gold-light: 38 55% 70%;
-    --gold-dark: 38 70% 38%;
-    --charcoal: 220 15% 13%;
-    --charcoal-light: 220 10% 25%;
-    --cream: 30 30% 95%;
-    --warm-white: 30 10% 97%;
+    /* Old 'gold' is now Hazard Red to automatically color UI elements */
+    --gold: 353 78% 56%; 
+    --gold-light: 353 85% 65%;
+    --gold-dark: 353 70% 45%;
+    
+    --charcoal: 0 0% 4%;
+    --charcoal-light: 0 0% 12%;
+    --cream: 0 0% 6%;
+    --warm-white: 0 0% 100%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar / admin panel */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 353 78% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 353 78% 56%;
   }
 
   .dark {
@@ -61,27 +72,27 @@
     --card-foreground: 30 10% 95%;
     --popover: 220 15% 11%;
     --popover-foreground: 30 10% 95%;
-    --primary: 38 65% 50%;
+    --primary: 353 78% 56%;
     --primary-foreground: 220 15% 8%;
     --secondary: 220 12% 18%;
     --secondary-foreground: 30 10% 95%;
     --muted: 220 12% 18%;
     --muted-foreground: 220 10% 60%;
-    --accent: 38 65% 50%;
+    --accent: 353 78% 56%;
     --accent-foreground: 220 15% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 220 12% 20%;
     --input: 220 12% 20%;
-    --ring: 38 65% 50%;
+    --ring: 353 78% 56%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary: 353 78% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 3.7% 15.9%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 353 78% 56%;
   }
 }
 
@@ -101,9 +112,42 @@
 
 @layer utilities {
   .text-gold-gradient {
-    background: linear-gradient(135deg, hsl(38 65% 50%), hsl(38 55% 70%));
+    /* Gradient adapted to Hazard Red */
+    background: linear-gradient(135deg, hsl(353 78% 56%), hsl(353 85% 65%));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+}
+
+/* =========================================================
+   НОВИТЕ МАГИИ ЗА VAZOV RIFLES (АНИМАЦИИ И ХОВЪР ЕФЕКТИ) 
+   ========================================================= */
+
+/* Анимация за изплуване на секциите */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-on-scroll {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+/* Червено сияние при посочване (за оръжията и екипировката) */
+.gold-glow-hover {
+  transition: all 0.4s ease-in-out !important;
+}
+
+.gold-glow-hover:hover {
+  /* Using Hazard Red values for the box-shadow */
+  box-shadow: 0 0 30px rgba(230, 57, 70, 0.4) !important;
+  transform: translateY(-5px);
+  border-color: rgba(230, 57, 70, 0.6) !important;
 }

@@ -1,49 +1,53 @@
-import { Check } from "lucide-react";
-
-const features = [
-  "Безплатна зона за деца до 5 години",
-  "Платена зона за деца от 3 до 13 години",
-  "Професионални аниматори",
-  "Безопасна и забавна среда",
-];
+import { Crosshair } from "lucide-react";
 
 const KidsSection = () => {
   return (
-    <section id="детски-кът" className="py-20 md:py-28 bg-secondary">
-      <div className="container px-4">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="rounded-lg overflow-hidden">
-            <img
-              src="/images/kids-area.jpg"
-              alt="Детски кът в ресторант LUXOR"
-              className="w-full h-80 md:h-[500px] object-cover rounded-lg"
-              loading="lazy"
-            />
-          </div>
-
-          <div>
-            <p className="text-gold font-body tracking-[0.3em] uppercase text-sm mb-4">Детски кът</p>
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-6">
-              Забавление за малчуганите
-            </h2>
-            <p className="text-muted-foreground font-body leading-relaxed mb-8 text-lg">
-              Докато вие се наслаждавате на кулинарните изкушения, вашите деца ще се забавляват
-              в нашите два специално оборудвани детски къта. Осигурете спокойствие на себе си
-              и незабравимо преживяване на малките.
-            </p>
-
-            <ul className="space-y-4">
-              {features.map((feature) => (
-                <li key={feature} className="flex items-center gap-3">
-                  <div className="w-6 h-6 rounded-full bg-gold/20 flex items-center justify-center flex-shrink-0">
-                    <Check className="w-3.5 h-3.5 text-gold" />
-                  </div>
-                  <span className="text-foreground font-body">{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <section id="тунинг" className="py-24 px-6 max-w-7xl mx-auto animate-on-scroll">
+      <div className="grid md:grid-cols-2 gap-16 items-center">
+        
+        {/* Снимка на работилница / тунинг */}
+        <div className="rounded-lg overflow-hidden border border-[#1a1a1a] relative group">
+          <img 
+            src="https://images.unsplash.com/photo-1509937528035-ad76254b0356?q=80&w=1000&auto=format&fit=crop" 
+            alt="Airsoft Tuning Workshop" 
+            className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" 
+          />
+          <div className="absolute inset-0 border-2 border-transparent group-hover:border-gold/50 transition-colors duration-500 rounded-lg pointer-events-none"></div>
         </div>
+        
+        {/* Текст за сервиза */}
+        <div>
+          <span className="text-gold text-xs uppercase tracking-widest font-bold block mb-4">Сервиз & Custom Проекти</span>
+          <h2 className="text-4xl md:text-5xl font-display mb-6 text-white uppercase tracking-wider">Изведи играта си на следващото ниво</h2>
+          <p className="text-gray-400 font-light mb-8 leading-relaxed">
+            Забрави за фабричните ограничения. В нашата работилница превръщаме стандартните реплики във високоточни машини за победа. От базово смазване до инсталация на сложна електроника – ние знаем какво правим.
+          </p>
+          
+          <ul className="space-y-4 text-sm text-gray-300 font-light">
+            <li className="flex items-start gap-4 p-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-md hover:border-gold/30 transition-colors group">
+              <Crosshair size={24} className="text-gold shrink-0 mt-0.5 group-hover:rotate-90 transition-transform duration-500" /> 
+              <div>
+                <strong className="block text-white mb-1 uppercase tracking-wider text-xs font-bold">Пълна профилактика</strong>
+                Почистване, смазване и шимване на скоростната кутия за максимален живот и тиха работа.
+              </div>
+            </li>
+            <li className="flex items-start gap-4 p-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-md hover:border-gold/30 transition-colors group">
+              <Crosshair size={24} className="text-gold shrink-0 mt-0.5 group-hover:rotate-90 transition-transform duration-500" /> 
+              <div>
+                <strong className="block text-white mb-1 uppercase tracking-wider text-xs font-bold">Електроника & MOSFET</strong>
+                Инсталация на GATE, Perun и други системи за мигновена реакция на спусъка.
+              </div>
+            </li>
+            <li className="flex items-start gap-4 p-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-md hover:border-gold/30 transition-colors group">
+              <Crosshair size={24} className="text-gold shrink-0 mt-0.5 group-hover:rotate-90 transition-transform duration-500" /> 
+              <div>
+                <strong className="block text-white mb-1 uppercase tracking-wider text-xs font-bold">Прецизност и Обсег</strong>
+                Смяна на цеви, R-hop и Flat-hop модификации за снайперска точност.
+              </div>
+            </li>
+          </ul>
+        </div>
+        
       </div>
     </section>
   );

@@ -1,35 +1,42 @@
-import { Facebook, Instagram, Twitter } from "lucide-react";
+import { Instagram, Facebook, Youtube, MapPin, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-primary py-10 border-t border-gold/20">
-      <div className="container px-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="text-center md:text-left">
-            <p className="text-2xl font-display font-bold tracking-[0.2em] text-gold mb-1">LUXOR</p>
-            <p className="text-sm text-primary-foreground/60 font-body">
-              © {new Date().getFullYear()} Ресторант LUXOR. Всички права запазени.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <a href="#" className="w-9 h-9 rounded-full border border-gold/30 flex items-center justify-center text-gold/70 hover:bg-gold hover:text-primary transition-colors" aria-label="Facebook">
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a href="#" className="w-9 h-9 rounded-full border border-gold/30 flex items-center justify-center text-gold/70 hover:bg-gold hover:text-primary transition-colors" aria-label="Instagram">
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a href="#" className="w-9 h-9 rounded-full border border-gold/30 flex items-center justify-center text-gold/70 hover:bg-gold hover:text-primary transition-colors" aria-label="Twitter">
-              <Twitter className="w-4 h-4" />
-            </a>
-          </div>
-
-          <div>
-            <a href="#" className="text-sm text-primary-foreground/60 font-body hover:text-gold transition-colors">
-              Политика за поверителност
-            </a>
-          </div>
+    <footer className="py-12 border-t border-[#1a1a1a] bg-[#040404] px-6 relative overflow-hidden">
+      {/* Лек червен акцент най-отгоре на футъра */}
+      <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-gold to-transparent opacity-50"></div>
+      
+      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        
+        {/* Лого и права */}
+        <div className="text-center md:text-left">
+          <h1 className="text-gold text-2xl font-display font-bold uppercase tracking-widest mb-2">Vazov Rifles</h1>
+          <p className="text-gray-600 text-xs tracking-widest uppercase">© {new Date().getFullYear()} Vazov Rifles. Всички права запазени.</p>
         </div>
+        
+        {/* Социални мрежи - Инстаграмът е най-важен тук */}
+        <div className="flex gap-6 text-gray-500">
+          <a href="https://www.instagram.com/vazovrifles/" target="_blank" rel="noreferrer" className="hover:text-gold hover:-translate-y-1 transition-all duration-300">
+            <Instagram size={24} />
+          </a>
+          <a href="#" className="hover:text-gold hover:-translate-y-1 transition-all duration-300">
+            <Facebook size={24} />
+          </a>
+          <a href="https://www.youtube.com/@VAZOVGROUP" className="hover:text-gold hover:-translate-y-1 transition-all duration-300">
+            <Youtube size={24} />
+          </a>
+        </div>
+        
+        {/* Кратък контакт */}
+        <div className="text-center md:text-right flex flex-col items-center md:items-end gap-2">
+          <p className="text-gray-500 text-xs uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors">
+            <MapPin size={14} className="text-gold" /> София, България
+          </p>
+          <p className="text-gray-500 text-xs uppercase tracking-widest flex items-center gap-2 hover:text-white transition-colors">
+            <Mail size={14} className="text-gold" /> hq@vazovrifles.bg
+          </p>
+        </div>
+        
       </div>
     </footer>
   );
