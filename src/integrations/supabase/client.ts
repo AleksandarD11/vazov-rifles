@@ -5,3 +5,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// само за development: да можем да дебъгваме от DevTools
+if (import.meta.env.DEV) {
+    (window as any).supabase = supabase;
+  }

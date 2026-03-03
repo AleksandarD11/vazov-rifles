@@ -1,66 +1,111 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Crosshair } from "lucide-react";
+import { Crosshair, Image as ImageIcon } from "lucide-react";
+
+type ServiceRow = {
+  id: string;
+  title: string;
+  description: string | null;
+};
+
+type SettingRow = {
+  key: string;
+  value: string;
+};
 
 const AboutSection = () => {
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<ServiceRow[]>([]);
+  const [mainImageUrl, setMainImageUrl] = useState<string>("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      const { data } = await supabase.from("services").select("*").order("created_at", { ascending: true });
-      if (data) setServices(data);
+    const run = async () => {
+      setLoading(true);
+
+      const [servicesRes, settingsRes] = await Promise.all([
+        supabase.from("services").select("*").order("created_at", { ascending: true }),
+        supabase.from("site_settings").select("*"),
+      ]);
+
+      if (servicesRes.data) setServices(servicesRes.data as ServiceRow[]);
+
+      if (settingsRes.data) {
+        const settings = settingsRes.data as SettingRow[];
+        const url = settings.find((s) => s.key === "services_main_image")?.value;
+        if (url) setMainImageUrl(url);
+      }
+
+      setLoading(false);
     };
-    fetchServices();
+
+    run();
   }, []);
 
   return (
-    <section className="py-20 bg-[#0a0a0a]">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="flex flex-col lg:flex-row gap-16 items-center">
-          
-          {/* ЛЯВА ЧАСТ: Снимката от сервиза */}
-          <div className="lg:w-1/2 w-full animate-in fade-in slide-in-from-left-8 duration-1000">
-            <div className="relative rounded-2xl overflow-hidden border border-[#1a1a1a] shadow-[0_0_30px_rgba(230,57,70,0.1)]">
-              <img 
-                src="https://images.unsplash.com/photo-1595590424283-b8f1784cb2c8?q=80&w=1000&auto=format&fit=crop" 
-                alt="Vazov Rifles Сервиз" 
-                className="w-full h-[500px] md:h-[600px] object-cover opacity-90 hover:opacity-100 transition-opacity duration-500"
+    <section id="тунинг" className="py-24 bg-[#040404]">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid lg:grid-cols-2 gap-10 items-stretch">
+          {/* ЛЯВО: динамична снимка от site_settings */}
+          <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.05)] min-h-[420px]">
+            {mainImageUrl ? (
+              <img
+                src={mainImageUrl}
+                alt="Сервиз - главна снимка"
+                className="w-full h-full object-cover"
+                loading="lazy"
               />
-              <div className="absolute inset-0 border-2 border-[#e63946]/20 rounded-2xl m-4 pointer-events-none"></div>
-            </div>
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 gap-3 p-10">
+                <ImageIcon className="text-gold" size={40} />
+                <p className="uppercase tracking-widest text-xs text-center">
+                  Няма зададена главна снимка.
+                  <br />
+                  Качи я от Admin → Services.
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* ДЯСНА ЧАСТ: Списък с услугите */}
-          <div className="lg:w-1/2 w-full">
-            <span className="text-[#e63946] text-xs font-bold tracking-widest uppercase block mb-2">Сервиз & Custom Проекти</span>
-            <h2 className="text-4xl md:text-5xl font-display font-bold text-white uppercase leading-tight mb-6">
-              Изведи играта си на <br className="hidden md:block"/> следващото ниво
-            </h2>
-            <p className="text-gray-400 mb-10 text-sm md:text-base leading-relaxed">
-              Забрави за фабричните ограничения. В нашата работилница превръщаме стандартните реплики във високоточни машини за победа. От базово смазване до инсталация на сложна електроника – ние знаем какво правим.
+          {/* ДЯСНО: услугите */}
+          <div className="rounded-2xl border border-[#1a1a1a] bg-[#0a0a0a] p-10 shadow-[0_0_50px_rgba(212,175,55,0.03)]">
+            <p className="text-gold text-xs font-bold uppercase tracking-widest mb-3 flex items-center gap-2">
+              <Crosshair size={16} /> Сервиз & Custom Проекти
             </p>
 
-            <div className="space-y-4">
+            <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4 uppercase">
+              Изведи играта си на следващото ниво
+            </h2>
+
+            <p className="text-gray-500 text-sm leading-relaxed mb-10">
+              Забрави за фабричните ограничения. В нашата работилница превръщаме стандартните
+              реплики във високоточни машини. От базово обслужване до сложна електроника – знаем какво правим.
+            </p>
+
+            <div className="space-y-6">
               {services.map((service) => (
-                <div key={service.id} className="bg-[#040404] border border-[#1a1a1a] p-6 rounded-xl flex gap-5 transition-all duration-300 hover:border-[#e63946]/50 hover:shadow-[0_0_15px_rgba(230,57,70,0.1)] hover:-translate-y-1">
-                  <div className="mt-1">
-                    <Crosshair className="text-[#e63946]" size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-white font-bold uppercase tracking-widest mb-2 text-sm">{service.title}</h3>
-                    <p className="text-gray-500 text-xs md:text-sm leading-relaxed">{service.description}</p>
-                  </div>
+                <div key={service.id} className="border border-[#1a1a1a] bg-[#040404] rounded-xl p-6">
+                  <h3 className="text-white font-bold uppercase tracking-wider mb-2">
+                    {service.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    {service.description || ""}
+                  </p>
                 </div>
               ))}
-              
-              {services.length === 0 && (
-                <div className="p-6 border border-[#1a1a1a] rounded-xl text-center">
-                  <p className="text-gray-500 italic text-sm">В момента зареждаме услугите...</p>
+
+              {loading && (
+                <div className="text-gray-500 uppercase tracking-widest text-xs">
+                  Зареждане...
+                </div>
+              )}
+
+              {!loading && services.length === 0 && (
+                <div className="text-gray-500 uppercase tracking-widest text-xs">
+                  Няма добавени услуги. Добави ги от Admin → Services.
                 </div>
               )}
             </div>
           </div>
-
         </div>
       </div>
     </section>
