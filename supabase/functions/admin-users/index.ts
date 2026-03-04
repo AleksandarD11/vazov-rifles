@@ -15,6 +15,7 @@ type Body = {
   action: Action;
   page?: number;
   perPage?: number;
+
   userId?: string;
   email?: string;
   password?: string;
@@ -73,14 +74,14 @@ const expectedRefFromUrl = (supabaseUrl: string) => {
 const decodeJwtPayload = (jwt: string) => {
   try {
     const parts = jwt.split(".");
-    if (parts.length !== 3) return { ok: false, error: "Not a JWT (must have 3 parts)" };
+    if (parts.length !== 3) return { ok: false as const, error: "Not a JWT" };
     const b64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
     const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
     const payloadStr = atob(padded);
     const payload = JSON.parse(payloadStr);
-    return { ok: true, payload };
+    return { ok: true as const, payload };
   } catch (e: any) {
-    return { ok: false, error: String(e?.message || e) };
+    return { ok: false as const, error: String(e?.message || e) };
   }
 };
 
@@ -98,7 +99,10 @@ Deno.serve(async (req) => {
   const SERVICE_ROLE_KEY = normalizeJwt(RAW_SERVICE_ROLE_KEY);
 
   const expectedRef = SUPABASE_URL ? expectedRefFromUrl(SUPABASE_URL) : null;
-  const decoded = SERVICE_ROLE_KEY ? decodeJwtPayload(SERVICE_ROLE_KEY) : { ok: false, error: "missing" as any };
+
+  const decoded = SERVICE_ROLE_KEY
+    ? decodeJwtPayload(SERVICE_ROLE_KEY)
+    : ({ ok: false, error: "missing" } as const);
 
   const tokenRef = decoded.ok ? (decoded.payload as any)?.ref ?? null : null;
   const tokenRole = decoded.ok ? (decoded.payload as any)?.role ?? null : null;
@@ -117,7 +121,6 @@ Deno.serve(async (req) => {
       jwt_decode_error: decoded.ok ? null : (decoded as any).error,
     };
 
-    // Бонус: истински тест дали service_role ключът работи (без да връщаме чувствителни данни)
     if (SUPABASE_URL && SERVICE_ROLE_KEY) {
       try {
         const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
@@ -133,11 +136,10 @@ Deno.serve(async (req) => {
         base.service_role_admin_api_error = String(e?.message || e);
       }
     }
-
     return base;
   };
 
-  // ✅ GET healthcheck + GET debug (без auth)
+  // GET healthcheck + GET debug (без auth)
   if (req.method === "GET") {
     const url = new URL(req.url);
     if (url.searchParams.get("debug") === "1") {
@@ -146,7 +148,7 @@ Deno.serve(async (req) => {
     return json({ ok: true, name: "admin-users", ts: new Date().toISOString() }, 200);
   }
 
-  // ✅ ако нещо липсва – казваме го ясно
+  // Missing envs
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY || !SERVICE_ROLE_KEY) {
     return fail("boot", 500, "Missing SUPABASE_URL / SUPABASE_ANON_KEY / SERVICE_ROLE_KEY", {
       supabase_url_present: !!SUPABASE_URL,
@@ -159,7 +161,7 @@ Deno.serve(async (req) => {
     return fail("boot", 500, "SERVICE_ROLE_KEY looks like a placeholder. Set the real service_role key.");
   }
 
-  // ако ref/role са грешни — връщаме супер ясно
+  // Ако ref mismatch -> “Invalid JWT” гаранция
   if (expectedRef && tokenRef && tokenRef !== expectedRef) {
     return fail("boot", 500, "SERVICE_ROLE_KEY is for a different Supabase project (ref mismatch).", {
       expected_ref: expectedRef,
@@ -178,27 +180,39 @@ Deno.serve(async (req) => {
     });
   }
 
-  // Parse body early (за debug POST)
+  // Parse body
   let body: Body | null = null;
   try {
     body = (await req.json()) as Body;
   } catch {
     return fail("request", 400, "Invalid JSON body");
   }
+
   if (!body?.action) return fail("request", 400, "Missing action");
 
-  // ✅ POST debug без auth (за да можеш да видиш дали ключът е валиден)
+  // POST debug без auth
   if (body.action === "debug") {
     return json(await debugPayload(), 200);
   }
 
-  // Auth header (тук ако липсва -> 401)
-  const authHeader =
-    req.headers.get("authorization") || req.headers.get("Authorization");
+  // ✅ Authorization header (тук падаш с 401 ако го няма)
+  const rawAuth =
+    req.headers.get("authorization") ||
+    req.headers.get("Authorization") ||
+    req.headers.get("x-supabase-authorization");
 
-  if (!authHeader) return fail("auth", 401, "Missing Authorization header");
+  if (!rawAuth) {
+    return fail("auth", 401, "Missing Authorization header", {
+      header_names: [...req.headers.keys()].sort(),
+      hint: "Client must send Authorization: Bearer <access_token>",
+    });
+  }
 
-  // User client (валидира access token)
+  const authHeader = rawAuth.toLowerCase().startsWith("bearer ")
+    ? rawAuth
+    : `Bearer ${rawAuth}`;
+
+  // User client: валидира JWT
   const userClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: {
       headers: { Authorization: authHeader },
@@ -208,23 +222,22 @@ Deno.serve(async (req) => {
   });
 
   const { data: userData, error: userErr } = await userClient.auth.getUser();
-
   if (userErr || !userData.user) {
     return fail("auth_get_user", 401, userErr?.message || "Invalid session", {
-      hint: "If this says 'Invalid JWT', your client session token is invalid for this project or is missing.",
+      hint: "If you see 'Invalid JWT' => project mismatch (URL/keys) OR old token.",
     });
   }
 
   const actorId = userData.user.id;
   const actorEmail = userData.user.email ?? null;
 
-  // Admin client (service role)
+  // Admin client: service_role
   const adminClient = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
     global: { fetch: (i, init) => fetchWithTimeout(i, init, 12000) },
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
 
-  // Admin check
+  // RBAC: admin only
   const { data: roleRow, error: roleErr } = await adminClient
     .from("user_roles")
     .select("role")
@@ -234,33 +247,14 @@ Deno.serve(async (req) => {
 
   if (roleErr) {
     return fail("admin_check_db", 500, roleErr.message, {
-      hint:
-        "If this says 'Invalid JWT', your SERVICE_ROLE_KEY secret is wrong/old or from another project. Re-copy service_role key from THIS project and set secrets again.",
-      expected_ref: expectedRef,
-      token_ref: tokenRef,
-      token_role: tokenRole,
-      key_preview: safePreview(SERVICE_ROLE_KEY),
+      hint: "If this says Invalid JWT => wrong SERVICE_ROLE_KEY secret (old/mismatched project).",
     });
   }
-
   if (!roleRow) return fail("rbac", 403, "Forbidden (admin only)");
 
-  // Audit helper
-  const audit = async (
-    action: string,
-    entity: string,
-    entity_id: string | null,
-    meta: Record<string, unknown> = {}
-  ) => {
+  const audit = async (action: string, entity: string, entity_id: string | null, meta: Record<string, unknown> = {}) => {
     const { error } = await adminClient.from("audit_logs").insert([
-      {
-        actor_user_id: actorId,
-        actor_email: actorEmail,
-        action,
-        entity,
-        entity_id,
-        meta,
-      },
+      { actor_user_id: actorId, actor_email: actorEmail, action, entity, entity_id, meta },
     ]);
     if (error) console.error("[admin-users] audit insert failed:", error.message);
   };
@@ -333,11 +327,7 @@ Deno.serve(async (req) => {
     const { error } = await adminClient.auth.admin.deleteUser(body.userId);
     if (error) return fail("auth_admin_delete", 500, error.message);
 
-    const { error: delRolesErr } = await adminClient
-      .from("user_roles")
-      .delete()
-      .eq("user_id", body.userId);
-
+    const { error: delRolesErr } = await adminClient.from("user_roles").delete().eq("user_id", body.userId);
     if (delRolesErr) console.error("[admin-users] delete roles failed:", delRolesErr.message);
 
     await audit("user.delete", "auth.users", body.userId, {});

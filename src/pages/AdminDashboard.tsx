@@ -245,34 +245,48 @@ const AdminDashboard = () => {
   const callAdminUsers = async (payload: any) => {
     const { data: sess, error: sessErr } = await supabase.auth.getSession();
     if (sessErr) throw new Error(sessErr.message);
-
+  
     const token = sess.session?.access_token;
     if (!token) throw new Error("Няма активна Supabase сесия. Влез пак.");
-
+  
+    // 1) Първо пробваме по правилния Supabase начин (най-надеждно)
+    const { data, error } = await supabase.functions.invoke("admin-users", {
+      body: payload,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  
+    if (!error) return data;
+  
+    // 2) Fallback: ръчен fetch (ако invoke бъде блокиран от нещо)
     const baseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const anon = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-    if (!baseUrl || !anon) {
-      throw new Error("Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY");
+    const apiKey =
+      import.meta.env.VITE_SUPABASE_ANON_KEY ||
+      import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  
+    if (!baseUrl || !apiKey) {
+      throw new Error(
+        "Missing VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (или VITE_SUPABASE_PUBLISHABLE_KEY)"
+      );
     }
-
+  
     const url = `${String(baseUrl).replace(/\/$/, "")}/functions/v1/admin-users`;
-
+  
     const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        apikey: anon,
+        apikey: apiKey,
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
     });
-
+  
     const body = await res.json().catch(() => ({}));
     if (!res.ok) {
       throw new Error(body?.error || body?.message || `HTTP ${res.status}`);
     }
-
     return body;
   };
 
