@@ -8,8 +8,8 @@ const KidsSection = () => {
         {/* Снимка на работилница / тунинг */}
         <div className="rounded-lg overflow-hidden border border-[#1a1a1a] relative group">
           <img 
-            src="https://images.unsplash.com/photo-1509937528035-ad76254b0356?q=80&w=1000&auto=format&fit=crop" 
-            alt="Airsoft Tuning Workshop" 
+            src="/images/custom-upgrade.png" 
+            alt="VAZOV RIFLES Custom Workshop - Airsoft Tuning and Assembly" 
             className="w-full h-[500px] object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" 
           />
           <div className="absolute inset-0 border-2 border-transparent group-hover:border-gold/50 transition-colors duration-500 rounded-lg pointer-events-none"></div>

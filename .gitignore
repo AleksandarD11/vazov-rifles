@@ -23,8 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+.env.*
 .env.local
 .env.functions
-.env.functions.*
-.env
-.env.*
+.env.disabled
+.env.functions.disabled

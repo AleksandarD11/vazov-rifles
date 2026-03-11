@@ -1,8 +1,11 @@
 import Navbar from "@/components/Navbar";
+import NightVisionOverlay from "@/components/NightVisionOverlay";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import KidsSection from "@/components/KidsSection";
 import MenuSection from "@/components/MenuSection";
+import EquipmentSection from "@/components/EquipmentSection";
+import TestimonialsSection from "@/components/TestimonialsSection";
 import GallerySection from "@/components/GallerySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
@@ -11,34 +14,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
-      {/* КОТВА: НАЧАЛО */}
-      <div id="начало">
-        <HeroSection />
-      </div>
+      <NightVisionOverlay />
 
-      {/* КОТВА: АРСЕНАЛ (Предполагам, че каталогът ти е в MenuSection) */}
-      <div id="арсенал">
-        <MenuSection />
-      </div>
-
-      {/* КОТВА: ТУНИНГ (Предполагам, че инфото ти е в AboutSection) */}
-      <div id="тунинг">
-        <AboutSection />
-      </div>
-
-      {/* Тази секция я оставям без котва, защото не е в менюто, но да не ти счупя дизайна */}
+      <div id="home"><HeroSection /></div>
+      <div id="arsenal"><MenuSection /></div>
+      <div id="equipment"><EquipmentSection /></div>
+      <div id="tuning"><AboutSection /></div>
       <KidsSection />
-
-      {/* КОТВА: В ДЕЙСТВИЕ */}
-      <div id="в-действие">
-        <GallerySection />
-      </div>
-
-      {/* КОТВА: КОНТАКТИ */}
-      <div id="контакти">
-        <ContactSection />
-      </div>
+      <TestimonialsSection />
+      <div id="action"><GallerySection /></div>
+      <div id="contacts"><ContactSection /></div>
 
       <Footer />
     </div>
