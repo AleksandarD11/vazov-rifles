@@ -29,7 +29,7 @@ const WeaponRig = ({
 }: {
   equipped: Record<AttachmentKey, boolean>;
 }) => {
-  const { scene } = useGLTF("/models/grip.glb");
+  const { scene } = useGLTF("/models/m16_assault_rifle.glb");
   const opticGlb = useGLTF("/models/optic.glb");
   const suppressorGlb = useGLTF("/models/suppressor.glb");
   const laserGlb = useGLTF("/models/laser.glb");
@@ -126,7 +126,7 @@ const Gunsmith3D = () => {
 
       <div className="pointer-events-auto absolute inset-0 h-full w-full">
         <Suspense fallback={<div className="flex h-full w-full items-center justify-center text-sm font-bold uppercase tracking-[0.28em] text-red-300">Loading 3D Model...</div>}>
-          <Canvas className="pointer-events-auto h-full w-full" camera={{ position: [3.2, 1.4, 6.4], fov: 38 }}>
+          <Canvas className="pointer-events-auto h-full w-full" camera={{ position: [5.8, 2.1, 10.6], fov: 42 }}>
             <fog attach="fog" args={["#040404", 7, 16]} />
             <ambientLight intensity={0.2} color="#f5f5f5" />
             <directionalLight position={[5, 6, 4]} intensity={1.6} color="#ffffff" />
@@ -254,7 +254,7 @@ const Gunsmith3D = () => {
   );
 };
 
-useGLTF.preload("/models/grip.glb");
+useGLTF.preload("/models/m16_assault_rifle.glb");
 useGLTF.preload("/models/optic.glb");
 useGLTF.preload("/models/suppressor.glb");
 useGLTF.preload("/models/laser.glb");
