@@ -1,6 +1,6 @@
 import { Suspense, useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { Center, Environment, Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { Center, Environment, OrbitControls, useGLTF } from "@react-three/drei";
 import { Box3, Vector3 } from "three";
 import { ShoppingCart, Sparkles, Target, Zap } from "lucide-react";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ const WeaponRig = ({
 }: {
   equipped: Record<AttachmentKey, boolean>;
 }) => {
-  const { scene } = useGLTF("/models/m16_assault_rifle.glb");
+  const { scene } = useGLTF("/models/grip.glb");
   const opticGlb = useGLTF("/models/optic.glb");
   const suppressorGlb = useGLTF("/models/suppressor.glb");
   const laserGlb = useGLTF("/models/laser.glb");
@@ -125,8 +125,8 @@ const Gunsmith3D = () => {
       </div>
 
       <div className="pointer-events-auto absolute inset-0 h-full w-full">
-        <Canvas className="pointer-events-auto h-full w-full" camera={{ position: [3.2, 1.4, 6.4], fov: 38 }}>
-          <Suspense fallback={<Html center className="rounded-full border border-red-500/30 bg-black/70 px-4 py-2 text-xs font-bold uppercase tracking-[0.32em] text-red-300 backdrop-blur-xl">LOADING ASSETS...</Html>}>
+        <Suspense fallback={<div className="flex h-full w-full items-center justify-center text-sm font-bold uppercase tracking-[0.28em] text-red-300">Loading 3D Model...</div>}>
+          <Canvas className="pointer-events-auto h-full w-full" camera={{ position: [3.2, 1.4, 6.4], fov: 38 }}>
             <fog attach="fog" args={["#040404", 7, 16]} />
             <ambientLight intensity={0.2} color="#f5f5f5" />
             <directionalLight position={[5, 6, 4]} intensity={1.6} color="#ffffff" />
@@ -151,8 +151,8 @@ const Gunsmith3D = () => {
               enableDamping={true}
               dampingFactor={0.04}
             />
-          </Suspense>
-        </Canvas>
+          </Canvas>
+        </Suspense>
       </div>
 
       <div className="pointer-events-none relative z-10 flex min-h-screen items-end justify-end p-4 md:p-8">
@@ -254,10 +254,9 @@ const Gunsmith3D = () => {
   );
 };
 
-useGLTF.preload("/models/m16_assault_rifle.glb");
+useGLTF.preload("/models/grip.glb");
 useGLTF.preload("/models/optic.glb");
 useGLTF.preload("/models/suppressor.glb");
 useGLTF.preload("/models/laser.glb");
-useGLTF.preload("/models/grip.glb");
 
 export default Gunsmith3D;
