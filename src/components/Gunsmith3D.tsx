@@ -54,7 +54,7 @@ const WeaponRig = ({
       <primitive object={normalizedScene} />
 
       {equipped.optic && (
-        <primitive object={opticScene} position={[0, 0.6, 0]} rotation={[6.25, -Math.PI / 2.01, 0.01]} scale={5} />
+        <primitive object={opticScene} position={[-0.01, 0.4, 0.01]} rotation={[6.25, -Math.PI / 1, 0.01]} scale={5} />
       )}
 
       {equipped.suppressor && (
@@ -62,7 +62,7 @@ const WeaponRig = ({
       )}
 
       {equipped.laser && (
-        <primitive object={laserScene} position={[0.18, 0, -1.1]} rotation={[5, -Math.PI / 2, 1.9]} scale={0.1} />
+        <primitive object={laserScene} position={[-0.24, 0, -1.1]} rotation={[5, -Math.PI / 2, 1.9]} scale={0.1} />
       )}
 
       {equipped.grip && (
