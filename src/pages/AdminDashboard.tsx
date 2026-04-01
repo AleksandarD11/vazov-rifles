@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import {
-  Crosshair, ShieldAlert, LogOut, Lock, Package, ImagePlus, Trash2, Upload, Pencil, X,
-  LayoutDashboard, ShoppingCart, PlusCircle, Settings, User, MapPin, Truck, Plus, Minus,
-  Save, CheckCircle2, Clock, XCircle, Wrench, Search, RefreshCw, Eye, Phone, Mail, Hash,
+  ShieldAlert, LogOut, Lock, Package, ImagePlus, Trash2, Upload, Pencil, X,
+  LayoutDashboard, ShoppingCart, PlusCircle, Settings, User, MapPin, Plus, Minus,
+  Save, CheckCircle2, Clock, Wrench, Search, RefreshCw, Eye, Phone, Mail, Hash,
   ClipboardList, Command, Download, Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -74,7 +75,7 @@ const toCSV = (rows: OrderItem[]) => {
 };
 
 const AdminDashboard = () => {
-  // Auth
+  const navigate = useNavigate();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
@@ -119,7 +120,6 @@ const AdminDashboard = () => {
   const initialOrderState = { name: "", phone: "", email: "", address: "", shipping: "Еконт Експрес", payment: "Наложен платеж", items: [] as ProductItem[], status: "completed" };
   const [newOrder, setNewOrder] = useState(initialOrderState);
 
-  // --- RBAC helper ---
   const verifyAdmin = async (userId: string) => {
     const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "admin" });
     return data === true;
@@ -175,27 +175,107 @@ const AdminDashboard = () => {
     } finally { setAuthLoading(false); }
   };
 
-  const handleLogout = async () => { await audit("auth.logout", "admin_panel"); await supabase.auth.signOut(); setIsAuthorized(false); setAuthEmail(""); setAuthPassword(""); setActiveTab("dashboard"); };
+  const handleLogout = async () => {
+    await audit("auth.logout", "admin_panel");
+    await supabase.auth.signOut();
+    setActiveTab("dashboard");
+    navigate("/admin/login", { replace: true });
+  };
 
   useEffect(() => {
     let cancelled = false;
-    const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (data.session?.user) {
-        const ok = await verifyAdmin(data.session.user.id);
-        if (ok) { setIsAuthorized(true); setAuthEmail(data.session.user.email ?? ""); } else { await supabase.auth.signOut(); setIsAuthorized(false); }
-      } else setIsAuthorized(false);
-      setAuthChecked(true);
+    let resolved = false;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+    const finishAuthCheck = () => {
+      if (!cancelled) setAuthChecked(true);
     };
-    init();
+
+    const clearAuthState = () => {
+      if (cancelled) return;
+      setIsAuthorized(false);
+      setAuthEmail("");
+    };
+
+    const safeSignOut = async () => {
+      try {
+        await supabase.auth.signOut();
+      } catch {}
+    };
+
+    const init = async () => {
+      timeoutId = setTimeout(() => {
+        if (resolved || cancelled) return;
+        resolved = true;
+        clearAuthState();
+        finishAuthCheck();
+        void safeSignOut();
+      }, 2000);
+
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (cancelled || resolved) return;
+
+        if (error || !data.session?.user) {
+          resolved = true;
+          clearAuthState();
+          await safeSignOut();
+          return;
+        }
+
+        const ok = await verifyAdmin(data.session.user.id);
+        if (cancelled || resolved) return;
+
+        if (ok) {
+          resolved = true;
+          setIsAuthorized(true);
+          setAuthEmail(data.session.user.email ?? "");
+        } else {
+          resolved = true;
+          clearAuthState();
+          await safeSignOut();
+        }
+      } catch {
+        if (cancelled || resolved) return;
+        resolved = true;
+        clearAuthState();
+        await safeSignOut();
+      } finally {
+        if (timeoutId) clearTimeout(timeoutId);
+        finishAuthCheck();
+      }
+    };
+
+    void init();
+
     const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (!session?.user) { setIsAuthorized(false); setAuthChecked(true); return; }
-      const ok = await verifyAdmin(session.user.id);
-      if (ok) { setIsAuthorized(true); setAuthEmail(session.user.email ?? ""); } else { await supabase.auth.signOut(); setIsAuthorized(false); }
-      setAuthChecked(true);
+      try {
+        if (!session?.user) {
+          clearAuthState();
+          return;
+        }
+
+        const ok = await verifyAdmin(session.user.id);
+        if (ok) {
+          setIsAuthorized(true);
+          setAuthEmail(session.user.email ?? "");
+        } else {
+          clearAuthState();
+          await safeSignOut();
+        }
+      } catch {
+        clearAuthState();
+        await safeSignOut();
+      } finally {
+        finishAuthCheck();
+      }
     });
-    return () => { cancelled = true; authListener.subscription.unsubscribe(); };
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   // --- Fetching ---
