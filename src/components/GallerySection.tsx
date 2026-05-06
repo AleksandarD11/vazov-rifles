@@ -1,12 +1,22 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+type GalleryImage = {
+  id: string;
+  title: string | null;
+  image_url: string | null;
+};
+
 const GallerySection = () => {
-  const [images, setImages] = useState<any[]>([]);
+  const [images, setImages] = useState<GalleryImage[]>([]);
 
   useEffect(() => {
     const fetchGallery = async () => {
-      const { data } = await supabase.from("gallery").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("gallery")
+        .select("id,title,image_url")
+        .order("created_at", { ascending: false })
+        .limit(9);
       if (data) setImages(data);
     };
     fetchGallery();
@@ -30,7 +40,7 @@ const GallerySection = () => {
           {images.map((img) => (
             <div key={img.id} className="relative group overflow-hidden rounded-xl border border-[#1a1a1a] aspect-video sm:aspect-auto sm:h-[400px]">
               <img 
-                src={img.image_url} 
+                src={img.image_url ?? ""} 
                 alt={img.title || "Vazov Rifles Action"} 
                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100" 
               />

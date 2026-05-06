@@ -24,16 +24,41 @@ const attachmentOptions: AttachmentOption[] = [
 
 const basePrice = 320;
 
+const attachmentModels: Record<AttachmentKey, string> = {
+  optic: "/models/optic.glb",
+  suppressor: "/models/suppressor.glb",
+  laser: "/models/laser.glb",
+  grip: "/models/grip.glb",
+};
+
+const attachmentTransforms: Record<
+  AttachmentKey,
+  {
+    position: [number, number, number];
+    rotation: [number, number, number];
+    scale: number;
+  }
+> = {
+  optic: { position: [-0.01, 0.4, 0.01], rotation: [6.25, -Math.PI / 1, 0.01], scale: 5 },
+  suppressor: { position: [-0.02, -0.07, -3.1], rotation: [6.25, -Math.PI / 1, 1], scale: 0.002 },
+  laser: { position: [-0.24, 0, -1.1], rotation: [5, -Math.PI / 2, 1.9], scale: 0.1 },
+  grip: { position: [0, -0.21, 0.15], rotation: [6.25, -Math.PI / 1, 0], scale: 8 },
+};
+
+const AttachmentModel = ({ attachmentKey }: { attachmentKey: AttachmentKey }) => {
+  const { scene } = useGLTF(attachmentModels[attachmentKey]);
+  const modelScene = useMemo(() => scene.clone(), [scene]);
+  const transform = attachmentTransforms[attachmentKey];
+
+  return <primitive object={modelScene} {...transform} />;
+};
+
 const WeaponRig = ({
   equipped,
 }: {
   equipped: Record<AttachmentKey, boolean>;
 }) => {
   const { scene } = useGLTF("/models/m16_assault_rifle.glb");
-  const opticGlb = useGLTF("/models/optic.glb");
-  const suppressorGlb = useGLTF("/models/suppressor.glb");
-  const laserGlb = useGLTF("/models/laser.glb");
-  const gripGlb = useGLTF("/models/grip.glb");
 
   const normalizedScene = useMemo(() => {
     const clone = scene.clone();
@@ -44,29 +69,13 @@ const WeaponRig = ({
     clone.scale.setScalar(scale);
     return clone;
   }, [scene]);
-  const opticScene = useMemo(() => opticGlb.scene.clone(), [opticGlb.scene]);
-  const suppressorScene = useMemo(() => suppressorGlb.scene.clone(), [suppressorGlb.scene]);
-  const laserScene = useMemo(() => laserGlb.scene.clone(), [laserGlb.scene]);
-  const gripScene = useMemo(() => gripGlb.scene.clone(), [gripGlb.scene]);
 
   return (
     <Center rotation={[0, 1.57, 0]}>
       <primitive object={normalizedScene} />
 
-      {equipped.optic && (
-        <primitive object={opticScene} position={[-0.01, 0.4, 0.01]} rotation={[6.25, -Math.PI / 1, 0.01]} scale={5} />
-      )}
-
-      {equipped.suppressor && (
-        <primitive object={suppressorScene} position={[-0.02, -0.07, -3.1]} rotation={[6.25, -Math.PI / 1, 1]} scale={0.002} />
-      )}
-
-      {equipped.laser && (
-        <primitive object={laserScene} position={[-0.24, 0, -1.1]} rotation={[5, -Math.PI / 2, 1.9]} scale={0.1} />
-      )}
-
-      {equipped.grip && (
-        <primitive object={gripScene} position={[0, -0.21, 0.15]} rotation={[6.25, -Math.PI / 1, 0]} scale={8} />
+      {attachmentOptions.map((option) =>
+        equipped[option.key] ? <AttachmentModel key={option.key} attachmentKey={option.key} /> : null
       )}
     </Center>
   );
@@ -253,10 +262,5 @@ const Gunsmith3D = () => {
     </section>
   );
 };
-
-useGLTF.preload("/models/m16_assault_rifle.glb");
-useGLTF.preload("/models/optic.glb");
-useGLTF.preload("/models/suppressor.glb");
-useGLTF.preload("/models/laser.glb");
 
 export default Gunsmith3D;

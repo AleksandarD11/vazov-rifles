@@ -160,7 +160,11 @@ const MenuSection = () => {
 
   useEffect(() => {
     const fetchArsenal = async () => {
-      const { data } = await supabase.from("arsenal").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("arsenal")
+        .select("id,title,description,price,image_url")
+        .order("created_at", { ascending: false })
+        .limit(12);
       if (data) setItems((data as ArsenalItem[]) ?? []);
     };
     fetchArsenal();

@@ -28,7 +28,11 @@ const EquipmentSection = () => {
 
   useEffect(() => {
     const fetchEquipment = async () => {
-      const { data } = await supabase.from("equipment").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase
+        .from("equipment")
+        .select("id,title,description,price,image_url")
+        .order("created_at", { ascending: false })
+        .limit(12);
       if (data) setItems((data as EquipmentItem[]) ?? []);
     };
     fetchEquipment();

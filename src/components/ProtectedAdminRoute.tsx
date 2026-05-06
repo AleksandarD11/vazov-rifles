@@ -26,7 +26,9 @@ const ProtectedAdminRoute = () => {
     const safeSignOut = async () => {
       try {
         await supabase.auth.signOut();
-      } catch {}
+      } catch {
+        // Ignore sign-out failures while guarding the route.
+      }
     };
 
     const checkSession = async () => {

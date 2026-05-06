@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,10 +11,16 @@ import emailjs from '@emailjs/browser';
 
 // --- ВАЛИДАТОРИ И ГЕНЕРАТОРИ ---
 const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const validatePhone = (phone: string) => /^[\d\s\+\-\(\)]{8,15}$/.test(phone);
+const validatePhone = (phone: string) => /^[\d\s+()-]{8,15}$/.test(phone);
 const generateOrderNumber = () => `VZ-${Math.floor(100000 + Math.random() * 900000)}`;
 
-export default function ReservationDialog({ children, open, onOpenChange }: any) {
+type ReservationDialogProps = {
+  children: ReactNode;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+};
+
+export default function ReservationDialog({ children, open, onOpenChange }: ReservationDialogProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", category: "", details: "" });
 

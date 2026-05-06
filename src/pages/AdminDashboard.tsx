@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -57,9 +58,14 @@ interface SiteSetting {
 
 type Tab = "dashboard" | "orders" | "create-order" | "arsenal" | "equipment" | "services" | "gallery" | "settings" | "audit";
 
+const PRODUCT_FIELDS = "id,title,description,price,image_url,created_at";
+const ORDER_FIELDS = "id,order_number,name,phone,email,address,total_price,status,details,is_manual,category,created_at";
+const SITE_SETTING_FIELDS = "key,value,description";
+const AUDIT_FIELDS = "id,created_at,actor_user_id,actor_email,action,entity,entity_id,meta";
+
 // --- ВАЛИДАТОРИ И ГЕНЕРАТОРИ ---
 const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-const validatePhone = (phone: string) => /^[\d\s\+\-\(\)]{8,15}$/.test(phone);
+const validatePhone = (phone: string) => /^[\d\s+()-]{8,15}$/.test(phone);
 const generateOrderNumber = () => `VZ-${Math.floor(100000 + Math.random() * 900000)}`;
 const cn = (...a: Array<string | false | null | undefined>) => a.filter(Boolean).join(" ");
 const nowFileName = (prefix: string, file: File) => {
@@ -130,7 +136,9 @@ const AdminDashboard = () => {
       const { data: sessionData } = await supabase.auth.getSession();
       const actor = sessionData.session?.user;
       await supabase.from("audit_logs").insert([{ actor_user_id: actor?.id ?? null, actor_email: actor?.email ?? null, action, entity, entity_id: entityId ?? null, meta }]);
-    } catch {}
+    } catch {
+      // Audit logging should never block the admin action.
+    }
   };
 
   // --- Commands ---
@@ -200,7 +208,9 @@ const AdminDashboard = () => {
     const safeSignOut = async () => {
       try {
         await supabase.auth.signOut();
-      } catch {}
+      } catch {
+        // Ignore sign-out failures during auth cleanup.
+      }
     };
 
     const init = async () => {
@@ -280,19 +290,19 @@ const AdminDashboard = () => {
 
   // --- Fetching ---
   const fetchAudit = async () => {
-    const { data } = await supabase.from("audit_logs").select("*").order("created_at", { ascending: false }).limit(200);
+    const { data } = await supabase.from("audit_logs").select(AUDIT_FIELDS).order("created_at", { ascending: false }).limit(200);
     if (data) setAuditLogs(data as AuditRow[]);
   };
 
   const fetchData = async () => {
     setIsRefreshing(true);
     const [ordersRes, arsenalRes, equipmentRes, settingsRes, servicesRes, galleryRes] = await Promise.all([
-        supabase.from("orders").select("*").order("created_at", { ascending: false }),
-        supabase.from("arsenal").select("*").order("created_at", { ascending: false }),
-        supabase.from("equipment").select("*").order("created_at", { ascending: false }),
-        supabase.from("site_settings").select("*"),
-        supabase.from("services").select("*").order("created_at", { ascending: false }),
-        supabase.from("gallery").select("*").order("created_at", { ascending: false }),
+        supabase.from("orders").select(ORDER_FIELDS).order("created_at", { ascending: false }),
+        supabase.from("arsenal").select(PRODUCT_FIELDS).order("created_at", { ascending: false }),
+        supabase.from("equipment").select(PRODUCT_FIELDS).order("created_at", { ascending: false }),
+        supabase.from("site_settings").select(SITE_SETTING_FIELDS),
+        supabase.from("services").select(PRODUCT_FIELDS).order("created_at", { ascending: false }),
+        supabase.from("gallery").select("id,title,image_url,created_at").order("created_at", { ascending: false }),
       ]);
     if (ordersRes.data) setOrders(ordersRes.data as OrderItem[]);
     if (arsenalRes.data) setArsenalItems(arsenalRes.data as ProductItem[]);
@@ -307,7 +317,7 @@ const AdminDashboard = () => {
     if (!isAuthorized) return;
     fetchData();
     const channel = supabase.channel("admin-orders-rt").on("postgres_changes", { event: "*", schema: "public", table: "orders" }, async () => {
-        const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
+        const { data } = await supabase.from("orders").select(ORDER_FIELDS).order("created_at", { ascending: false });
         if (data) setOrders(data as OrderItem[]);
     }).subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -369,7 +379,7 @@ const AdminDashboard = () => {
         await supabase.from(table).update(payload).eq("id", editId);
         await audit(`${table}.update`, table, editId, { title });
       } else {
-        const { data } = await supabase.from(table).insert([payload]).select().single();
+        const { data } = await supabase.from(table).insert([payload]).select("id").single();
         await audit(`${table}.create`, table, data?.id, { title });
       }
       toast.success("Успешно запазено!", { id: tId }); cancelEdit(); fetchData();
@@ -435,7 +445,7 @@ const AdminDashboard = () => {
     const orderNum = generateOrderNumber();
     const finalPrice = `${Number(newOrderTotal).toFixed(2)} €`;
 
-    const { data, error } = await supabase.from("orders").insert([{ order_number: orderNum, name: newOrder.name, phone: newOrder.phone, email: newOrder.email, address: newOrder.address, total_price: finalPrice, details: `Ръчна поръчка:\n${details}`, status: newOrder.status, is_manual: true, category: "Ръчна заявка" }]).select("*").single();
+    const { data, error } = await supabase.from("orders").insert([{ order_number: orderNum, name: newOrder.name, phone: newOrder.phone, email: newOrder.email, address: newOrder.address, total_price: finalPrice, details: `Ръчна поръчка:\n${details}`, status: newOrder.status, is_manual: true, category: "Ръчна заявка" }]).select("id").single();
     if (!error) {
       toast.success(`Създадена! Номер: ${orderNum}`, { id: tId }); await audit("orders.manual.create", "orders", data?.id);
       if (newOrder.email) sendEmailNotification(newOrder.email, newOrder.status, orderNum, newOrder.name, `Ръчна поръчка:\n${details}`, finalPrice, newOrder.shipping, newOrder.payment);
