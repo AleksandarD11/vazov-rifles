@@ -56,17 +56,17 @@ const Navbar = () => {
           : "bg-transparent"
       }`}
     >
-      <div className="w-full flex justify-between items-center px-6 py-4">
+      <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:py-4">
         <button
           type="button"
           onClick={() => scrollTo("#home")}
-          className="shrink-0 whitespace-nowrap text-left text-2xl font-display font-black tracking-widest text-white transition-colors group"
+          className="shrink-0 whitespace-nowrap text-left font-display text-xl font-black tracking-widest text-white transition-colors group sm:text-2xl"
         >
           <span>VAZOV </span>
           <span className="text-red-600 group-hover:text-red-500">RIFLES</span>
         </button>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden items-center gap-5 min-[1400px]:flex 2xl:gap-6">
           {navLinks.map((link) => (
             <button
               key={link.name}
@@ -80,14 +80,6 @@ const Navbar = () => {
           ))}
 
           <Link
-            to="/gun-lab"
-            onMouseEnter={playHoverSound}
-            className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-red-400 transition-colors hover:text-white"
-          >
-            GUN LAB
-          </Link>
-
-          <Link
             to="/gunsmith-3d"
             onMouseEnter={playHoverSound}
             className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-gray-300 transition-colors hover:text-white"
@@ -96,12 +88,12 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3 xl:gap-4">
           <button
             type="button"
             onClick={handleToggleNightVision}
             onMouseEnter={playHoverSound}
-            className={`hidden md:inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] transition-all ${
+            className={`hidden min-h-[44px] items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] transition-all min-[1400px]:inline-flex ${
               isNightVisionActive
                 ? "border-green-300/40 bg-green-500/15 text-green-100 shadow-[0_0_30px_rgba(74,222,128,0.28)]"
                 : "border-white/10 bg-white/[0.03] text-gray-300 hover:border-green-400/40 hover:text-white"
@@ -117,7 +109,7 @@ const Navbar = () => {
             type="button"
             onClick={handleOpenCart}
             onMouseEnter={playHoverSound}
-            className="relative inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-3 text-gray-300 transition-all hover:border-red-500/50 hover:text-white"
+            className="relative inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] p-3 text-gray-300 transition-all hover:border-red-500/50 hover:text-white"
             aria-label="Open cart"
           >
             <ShoppingCart size={20} />
@@ -131,14 +123,14 @@ const Navbar = () => {
           <Button
             onClick={handleOpenCart}
             onMouseEnter={playHoverSound}
-            className="hidden md:inline-flex whitespace-nowrap rounded-xl border border-red-500/50 bg-red-600 px-6 py-5 text-sm font-bold uppercase tracking-widest text-white transition-all hover:bg-red-500"
+            className="hidden min-h-[44px] whitespace-nowrap rounded-xl border border-red-500/50 bg-red-600 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-red-500 min-[1400px]:inline-flex 2xl:px-5 2xl:py-4 2xl:text-sm"
           >
             НАПРАВИ ПОРЪЧКА
           </Button>
 
           <button
             type="button"
-            className="text-white md:hidden"
+            className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-white min-[1400px]:hidden"
             onClick={() => setIsOpen((open) => !open)}
             aria-label="Toggle menu"
           >
@@ -148,38 +140,29 @@ const Navbar = () => {
       </div>
 
       <div
-        className={`md:hidden border-t border-white/10 bg-[#0a0a0a]/95 px-6 py-4 backdrop-blur-xl transition-all duration-300 ${
+        className={`border-t border-white/10 bg-[#0a0a0a]/95 px-4 py-4 backdrop-blur-xl transition-all duration-300 sm:px-6 min-[1400px]:hidden ${
           isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
         {isOpen && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <button
                 key={link.name}
                 type="button"
                 onClick={() => scrollTo(link.href)}
                 onMouseEnter={playHoverSound}
-                className="whitespace-nowrap text-left text-sm font-bold uppercase tracking-widest text-gray-300 transition-colors hover:text-white"
+                className="min-h-[44px] whitespace-normal break-words text-left text-sm font-bold uppercase leading-tight tracking-widest text-gray-300 transition-colors hover:text-white"
               >
                 {link.name}
               </button>
             ))}
 
             <Link
-              to="/gun-lab"
-              onClick={() => setIsOpen(false)}
-              onMouseEnter={playHoverSound}
-              className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-red-400 transition-colors hover:text-white"
-            >
-              GUN LAB
-            </Link>
-
-            <Link
               to="/gunsmith-3d"
               onClick={() => setIsOpen(false)}
               onMouseEnter={playHoverSound}
-              className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-gray-300 transition-colors hover:text-white"
+              className="min-h-[44px] whitespace-normal break-words text-sm font-bold uppercase leading-tight tracking-widest text-gray-300 transition-colors hover:text-white"
             >
               3D ОРЪЖЕЙНИК
             </Link>
@@ -188,7 +171,7 @@ const Navbar = () => {
               type="button"
               onClick={handleToggleNightVision}
               onMouseEnter={playHoverSound}
-              className={`inline-flex w-fit items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] transition-all ${
+              className={`inline-flex min-h-[44px] w-fit items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] transition-all ${
                 isNightVisionActive
                   ? "border-green-300/40 bg-green-500/15 text-green-100"
                   : "border-white/10 bg-white/[0.03] text-gray-300"
@@ -206,7 +189,7 @@ const Navbar = () => {
                 handleOpenCart();
               }}
               onMouseEnter={playHoverSound}
-              className="w-full whitespace-nowrap rounded-xl border border-red-500/50 bg-red-600 py-5 text-sm font-bold uppercase tracking-widest text-white hover:bg-red-500"
+              className="min-h-[48px] w-full whitespace-normal rounded-xl border border-red-500/50 bg-red-600 py-4 text-sm font-bold uppercase leading-tight tracking-widest text-white hover:bg-red-500"
             >
               НАПРАВИ ПОРЪЧКА
             </Button>

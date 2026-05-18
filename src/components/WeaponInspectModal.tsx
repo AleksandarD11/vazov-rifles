@@ -82,7 +82,7 @@ const WeaponInspectModal = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[999] bg-black"
+          className="fixed inset-0 z-[999] overflow-y-auto overflow-x-hidden bg-black"
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(220,38,38,0.28),transparent_35%),radial-gradient(circle_at_80%_10%,rgba(220,38,38,0.14),transparent_30%),linear-gradient(180deg,#020202_0%,#050505_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:24px_24px] opacity-15" />
@@ -90,12 +90,12 @@ const WeaponInspectModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="absolute right-6 top-6 z-30 inline-flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition hover:border-red-500/40 hover:text-white"
+            className="fixed right-4 top-4 z-30 inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-gray-300 transition hover:border-red-500/40 hover:text-white sm:right-6 sm:top-6 sm:h-12 sm:w-12"
           >
             <X size={18} />
           </button>
 
-          <div className="relative z-10 grid min-h-screen items-center gap-8 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:px-14">
+          <div className="relative z-10 grid min-h-screen items-center gap-6 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8 lg:px-14">
             <div className="relative flex items-center justify-center">
               <motion.div
                 animate={{ y: [0, -10, 0], rotate: [0, 1.5, 0] }}
@@ -106,33 +106,33 @@ const WeaponInspectModal = ({
                 <img
                   src={weapon.image_url ?? ""}
                   alt={weapon.title}
-                  className="relative z-10 max-h-[70vh] w-full object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.75)]"
+                  className="relative z-10 max-h-[42vh] w-full object-contain drop-shadow-[0_35px_60px_rgba(0,0,0,0.75)] sm:max-h-[55vh] lg:max-h-[70vh]"
                 />
               </motion.div>
             </div>
 
-            <div className="rounded-[36px] border border-red-500/20 bg-white/[0.03] p-8 backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.45)]">
-              <div className="flex items-center gap-3 text-red-400">
+            <div className="min-w-0 rounded-[24px] border border-red-500/20 bg-white/[0.03] p-5 backdrop-blur-xl shadow-[0_30px_100px_rgba(0,0,0,0.45)] sm:rounded-[36px] sm:p-8">
+              <div className="flex min-w-0 items-center gap-3 text-red-400">
                 <Crosshair size={18} />
-                <span className="text-[11px] font-bold uppercase tracking-[0.35em]">
+                <span className="break-words text-[10px] font-bold uppercase tracking-[0.18em] sm:text-[11px] sm:tracking-[0.35em]">
                   СИСТЕМНА ДИАГНОСТИКА
                 </span>
               </div>
 
               <div className="mt-8">
-                <div className="font-mono text-[11px] uppercase tracking-[0.34em] text-green-300/70">
+                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-green-300/70 sm:text-[11px] sm:tracking-[0.34em]">
                   [ ДЕКРИПТИРАНЕ НА ДАННИ... ]
                 </div>
-                <h3 className="mt-3 min-h-[96px] font-mono text-4xl font-black uppercase tracking-[0.14em] text-green-300">
+                <h3 className="mt-3 min-h-[72px] break-words font-mono text-2xl font-black uppercase tracking-[0.08em] text-green-300 sm:min-h-[96px] sm:text-4xl sm:tracking-[0.14em]">
                   {titleText}
                 </h3>
               </div>
 
               <div className="mt-8">
-                <div className="font-mono text-[11px] uppercase tracking-[0.34em] text-red-300/70">
+                <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-red-300/70 sm:text-[11px] sm:tracking-[0.34em]">
                   [ БАЗОВА ЦЕНА ]
                 </div>
-                <div className="mt-3 font-mono text-3xl font-black uppercase tracking-[0.18em] text-red-400">
+                <div className="mt-3 break-words font-mono text-2xl font-black uppercase tracking-[0.1em] text-red-400 sm:text-3xl sm:tracking-[0.18em]">
                   {priceText}
                 </div>
               </div>
@@ -147,13 +147,13 @@ const WeaponInspectModal = ({
                     initial={{ opacity: 0, y: 18 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 18 }}
-                    className="mt-10 rounded-[28px] border border-white/10 bg-black/30 p-6"
+                    className="mt-8 rounded-[24px] border border-white/10 bg-black/30 p-4 sm:mt-10 sm:rounded-[28px] sm:p-6"
                   >
-                    <div className="text-[11px] font-bold uppercase tracking-[0.34em] text-white/70">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/70 sm:text-[11px] sm:tracking-[0.34em]">
                       ТАКТИЧЕСКИ ПОКАЗАТЕЛИ
                     </div>
                     <div className="mt-5 flex items-center justify-center">
-                      <div className="relative h-56 w-56 rounded-full border border-red-500/30">
+                      <div className="relative h-44 w-44 rounded-full border border-red-500/30 sm:h-56 sm:w-56">
                         <div className="absolute inset-5 rounded-full border border-red-500/20" />
                         <div className="absolute inset-10 rounded-full border border-red-500/15" />
                         <div className="absolute inset-0 rounded-full bg-[conic-gradient(from_180deg,rgba(220,38,38,0.08),rgba(255,255,255,0.02),rgba(220,38,38,0.08))]" />

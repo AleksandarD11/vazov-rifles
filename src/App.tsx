@@ -13,7 +13,6 @@ const Index = lazy(() => import("./pages/Index"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const GunLabPage = lazy(() => import("./pages/GunLabPage"));
 const Gunsmith3DPage = lazy(() => import("./pages/Gunsmith3DPage"));
 
 const queryClient = new QueryClient();
@@ -51,7 +50,6 @@ const App = () => (
         <Suspense fallback={<TacticalLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/gun-lab" element={<GunLabPage />} />
             <Route path="/gunsmith-3d" element={<Gunsmith3DPage />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route element={<ProtectedAdminRoute />}>

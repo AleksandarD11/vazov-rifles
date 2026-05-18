@@ -37,7 +37,7 @@ export default function PremiumOrderModal({ isOpen, onClose }: PremiumOrderModal
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-6">
           {/* Тъмен стъклен фон, който покрива ЦЕЛИЯ екран */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -53,24 +53,24 @@ export default function PremiumOrderModal({ isOpen, onClose }: PremiumOrderModal
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", duration: 0.5 }}
-            className="relative w-full max-w-lg bg-[#0a0a0a] border border-red-600/30 rounded-3xl shadow-[0_0_80px_rgba(220,38,38,0.2)] flex flex-col max-h-[90vh] overflow-hidden"
+            className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-3xl border border-red-600/30 bg-[#0a0a0a] shadow-[0_0_80px_rgba(220,38,38,0.2)]"
           >
             {/* Хедър на модала */}
-            <div className="p-6 border-b border-[#1a1a1a] flex justify-between items-center bg-gradient-to-r from-[#111] to-[#040404]">
-              <h3 className="text-xl sm:text-2xl font-black text-white uppercase tracking-widest flex items-center gap-3">
+            <div className="flex items-center justify-between gap-4 border-b border-[#1a1a1a] bg-gradient-to-r from-[#111] to-[#040404] p-4 sm:p-6">
+              <h3 className="flex min-w-0 items-center gap-3 break-words text-lg font-black uppercase tracking-wider text-white sm:text-2xl sm:tracking-widest">
                 <Crosshair className="text-red-600" /> Запитване
               </h3>
               <button 
                 onClick={onClose} 
-                className="text-gray-500 hover:text-red-500 bg-[#040404] border border-[#222] p-2 rounded-xl transition-all hover:border-red-500/50"
+                className="min-h-[44px] min-w-[44px] rounded-xl border border-[#222] bg-[#040404] p-2 text-gray-500 transition-all hover:border-red-500/50 hover:text-red-500"
               >
                 <X size={20} />
               </button>
             </div>
 
             {/* Скролируема форма вътре */}
-            <div className="p-6 overflow-y-auto custom-scrollbar">
-              <form id="order-form" onSubmit={handleSubmit} className="space-y-6">
+            <div className="overflow-y-auto p-4 custom-scrollbar sm:p-6">
+              <form id="order-form" onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
                 
                 {/* Име */}
                 <div>
@@ -87,7 +87,7 @@ export default function PremiumOrderModal({ isOpen, onClose }: PremiumOrderModal
                 </div>
 
                 {/* Телефон & Имейл (на 2 колони) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6">
                   <div>
                     <label className="text-[10px] text-gray-500 uppercase tracking-widest block mb-2 flex items-center gap-2">
                       <Phone size={14} className="text-red-500" /> Телефон *
@@ -131,19 +131,19 @@ export default function PremiumOrderModal({ isOpen, onClose }: PremiumOrderModal
             </div>
 
             {/* Бутони (Залепени най-отдолу) */}
-            <div className="p-6 border-t border-[#1a1a1a] flex gap-4 bg-[#0a0a0a]">
+            <div className="flex flex-col gap-3 border-t border-[#1a1a1a] bg-[#0a0a0a] p-4 sm:flex-row sm:gap-4 sm:p-6">
               <Button 
                 type="button" 
                 onClick={onClose} 
                 variant="outline" 
-                className="flex-1 border-[#333] text-gray-400 hover:text-white hover:bg-[#111] py-6 rounded-xl"
+                className="min-h-[48px] flex-1 rounded-xl border-[#333] py-4 text-gray-400 hover:bg-[#111] hover:text-white sm:py-6"
               >
                 Отказ
               </Button>
               <Button 
                 type="submit" 
                 form="order-form"
-                className="flex-[2] bg-red-600 text-white font-bold uppercase tracking-widest py-6 hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.3)] rounded-xl"
+                className="min-h-[48px] flex-[2] rounded-xl bg-red-600 py-4 font-bold uppercase tracking-widest text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:bg-red-500 sm:py-6"
               >
                 <Send size={18} className="mr-2" /> Изпрати
               </Button>

@@ -36,26 +36,26 @@ const reviews = [
 
 const TestimonialsSection = () => {
   return (
-    <section className="py-28 bg-[#040404] relative overflow-hidden">
+    <section className="relative overflow-hidden bg-[#040404] py-14 sm:py-20 lg:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(239,68,68,0.1),transparent_35%),radial-gradient(circle_at_80%_80%,rgba(239,68,68,0.08),transparent_35%)] pointer-events-none" />
-      <div className="container mx-auto px-4 md:px-8 relative z-10">
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="max-w-3xl mb-12"
+          className="mb-10 max-w-3xl sm:mb-12"
         >
           <p className="text-red-500 text-xs font-bold uppercase tracking-[0.24em] mb-4">Elite Reviews</p>
-          <h2 className="text-4xl md:text-5xl font-black text-white uppercase tracking-tight mb-4">
+          <h2 className="mb-4 break-words text-3xl font-black uppercase tracking-tight text-white sm:text-4xl lg:text-5xl">
             Отзиви от Играчи на Високо Ниво
           </h2>
-          <p className="text-gray-400 text-base leading-relaxed">
+          <p className="text-sm leading-relaxed text-gray-400 sm:text-base">
             Реални резултати от полеви тестове, състезания и тежки сценарии. Когато се иска върхова надеждност, изборът е един.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 xl:gap-6">
           {reviews.map((review, idx) => (
             <motion.article
               key={review.name + idx}
@@ -63,7 +63,7 @@ const TestimonialsSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.5, delay: idx * 0.08 }}
-              className="bg-white/[0.02] border border-white/5 rounded-3xl p-7 shadow-[0_0_35px_rgba(239,68,68,0.08)] hover:shadow-[0_0_45px_rgba(239,68,68,0.14)] hover:border-red-500/30 transition-all"
+              className="min-w-0 rounded-3xl border border-white/5 bg-white/[0.02] p-5 shadow-[0_0_35px_rgba(239,68,68,0.08)] transition-all hover:border-red-500/30 hover:shadow-[0_0_45px_rgba(239,68,68,0.14)] sm:p-7"
             >
               <div className="flex items-center gap-1 mb-4 text-red-500">
                 {Array.from({ length: 5 }).map((_, i) => (

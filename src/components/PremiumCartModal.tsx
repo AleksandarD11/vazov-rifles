@@ -107,11 +107,6 @@ const PremiumCartModal = () => {
     const maxRows = stashLayout.reduce((max, item) => Math.max(max, item.row + item.rows), 0);
     return Math.max(420, maxRows * 92 + 22);
   }, [stashLayout]);
-  const stashWeight = useMemo(() => {
-    const seed = items.reduce((sum, item) => sum + item.id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0), 0);
-    return (5 + (seed % 10) + totalQty * 0.35).toFixed(1);
-  }, [items, totalQty]);
-
   const validate = () => {
     const nextErrors: Record<string, string> = {};
 
@@ -183,7 +178,10 @@ const PremiumCartModal = () => {
           import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         )
         .then(() => toast.success("Имейл известието е изпратено."))
-        .catch(() => toast.error("Поръчката е запазена, но имейлът не се изпрати."));
+        .catch((emailError) => {
+          console.error("Order email notification failed", emailError);
+          toast.success("Поръчката е запазена. Ще се свържем с вас за потвърждение.");
+        });
 
       clearCart();
       setCartOpen(false);
@@ -197,8 +195,8 @@ const PremiumCartModal = () => {
       setErrors({});
       toast.success("Поръчката е изпратена успешно.");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Възникна грешка при изпращане на поръчката.";
-      toast.error(message);
+      console.error("Order submission failed", err);
+      toast.error("Не успяхме да изпратим поръчката. Моля, опитайте отново или се свържете с нас.");
     } finally {
       setIsProcessing(false);
     }
@@ -213,7 +211,7 @@ const PremiumCartModal = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] bg-black/80 p-4 backdrop-blur-2xl md:p-8"
+          className="fixed inset-0 z-[9999] bg-black/80 p-3 backdrop-blur-2xl sm:p-4 md:p-8"
           onClick={() => setCartOpen(false)}
         >
           <motion.div
@@ -222,17 +220,17 @@ const PremiumCartModal = () => {
             exit={{ opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.28 }}
             onClick={(e) => e.stopPropagation()}
-            className="mx-auto h-full max-w-7xl overflow-hidden rounded-[36px] border border-red-500/20 bg-[#070707]/95 shadow-[0_0_120px_rgba(239,68,68,0.16)]"
+            className="mx-auto h-full w-full max-w-7xl overflow-hidden rounded-[24px] border border-red-500/20 bg-[#070707]/95 shadow-[0_0_120px_rgba(239,68,68,0.16)] sm:rounded-[36px]"
           >
             <div className="h-full overflow-y-auto">
-              <div className="sticky top-0 z-20 flex items-center justify-between border-b border-white/10 bg-[#070707]/95 px-6 py-5 backdrop-blur-xl md:px-10">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/30 bg-red-600/10 text-red-400">
+              <div className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-white/10 bg-[#070707]/95 px-4 py-4 backdrop-blur-xl sm:px-6 sm:py-5 md:px-10">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-red-500/30 bg-red-600/10 text-red-400 sm:h-12 sm:w-12">
                     <ShoppingCart size={20} />
                   </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-[0.36em] text-red-300/70">The Tarkov Stash</div>
-                    <h3 className="text-xl font-black uppercase tracking-[0.22em] text-white md:text-2xl">
+                  <div className="min-w-0">
+                    <div className="text-[10px] uppercase tracking-[0.2em] text-red-300/70 sm:tracking-[0.36em]">The Tarkov Stash</div>
+                    <h3 className="break-words text-lg font-black uppercase tracking-[0.14em] text-white sm:text-xl md:text-2xl md:tracking-[0.22em]">
                       Elite Cart ({totalQty})
                     </h3>
                   </div>
@@ -242,37 +240,38 @@ const PremiumCartModal = () => {
                 </button>
               </div>
 
-              <div className="grid gap-8 p-6 md:p-10 xl:grid-cols-[1.15fr_0.85fr]">
-                <div className="space-y-4">
-                  <div className="rounded-[30px] border border-white/10 bg-white/[0.03] p-5 md:p-6">
-                    <div className="mb-5 flex items-center justify-between">
-                      <div>
-                        <div className="text-[10px] uppercase tracking-[0.36em] text-red-300/70">Inventory Grid</div>
-                        <div className="mt-2 text-lg font-black uppercase tracking-[0.2em] text-white">Stash Layout</div>
+              <div className="grid gap-5 p-4 sm:p-6 md:p-8 xl:grid-cols-[1.15fr_0.85fr] xl:gap-8 xl:p-10">
+                <div className="min-w-0 space-y-4">
+                  <div className="rounded-[24px] border border-white/10 bg-white/[0.03] p-4 sm:rounded-[30px] sm:p-5 md:p-6">
+                    <div className="mb-5 flex min-w-0 items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-red-300/70 sm:tracking-[0.36em]">Inventory Grid</div>
+                        <div className="mt-2 text-base font-black uppercase tracking-[0.14em] text-white sm:text-lg sm:tracking-[0.2em]">Stash Layout</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-[10px] uppercase tracking-[0.32em] text-white/50">Drag Items</div>
-                        <div className="mt-2 text-sm font-black uppercase tracking-[0.18em] text-red-300">
+                      <div className="shrink-0 text-right">
+                        <div className="text-[10px] uppercase tracking-[0.18em] text-white/50 sm:tracking-[0.32em]">Drag Items</div>
+                        <div className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-red-300 sm:text-sm sm:tracking-[0.18em]">
                           Modular Slots
                         </div>
                       </div>
                     </div>
 
-                    <div
-                      ref={stashRef}
-                      className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[#020202]"
-                      style={{ height: stashHeight }}
-                    >
-                      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:92px_92px]" />
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(220,38,38,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%)]" />
+                    <div className="overflow-x-auto rounded-[22px] border border-white/10 bg-[#020202] sm:rounded-[28px]">
+                      <div
+                        ref={stashRef}
+                        className="relative min-w-[552px] overflow-hidden"
+                        style={{ height: stashHeight }}
+                      >
+                        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:92px_92px]" />
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(220,38,38,0.12),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.02),transparent_35%)]" />
 
-                      {items.length === 0 && (
-                        <div className="absolute inset-0 flex items-center justify-center p-10 text-center text-xs uppercase tracking-[0.3em] text-white/45">
-                          Stash empty. Insert hardware to begin operation.
-                        </div>
-                      )}
+                        {items.length === 0 && (
+                          <div className="absolute inset-0 flex items-center justify-center p-10 text-center text-xs uppercase tracking-[0.3em] text-white/45">
+                            Stash empty. Insert hardware to begin operation.
+                          </div>
+                        )}
 
-                      {items.map((item) => {
+                        {items.map((item) => {
                         const slot = stashLayout.find((entry) => entry.id === item.id);
                         if (!slot) return null;
 
@@ -346,30 +345,25 @@ const PremiumCartModal = () => {
                             </div>
                           </motion.div>
                         );
-                      })}
+                        })}
+                      </div>
                     </div>
 
-                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                    <div className="mt-5">
                       <div className="rounded-[24px] border border-red-500/20 bg-red-600/10 px-5 py-4">
-                        <div className="text-[10px] uppercase tracking-[0.34em] text-red-300/70">Stash Value</div>
-                        <div className="mt-2 text-3xl font-black uppercase tracking-[0.2em] text-red-400">
+                        <div className="text-[10px] uppercase tracking-[0.2em] text-red-300/70 sm:tracking-[0.34em]">Stash Value</div>
+                        <div className="mt-2 break-words text-2xl font-black uppercase tracking-[0.14em] text-red-400 sm:text-3xl sm:tracking-[0.2em]">
                           {parseToPrice(total)} €
-                        </div>
-                      </div>
-                      <div className="rounded-[24px] border border-white/10 bg-white/[0.04] px-5 py-4">
-                        <div className="text-[10px] uppercase tracking-[0.34em] text-white/45">Weight</div>
-                        <div className="mt-2 text-3xl font-black uppercase tracking-[0.2em] text-white">
-                          {stashWeight} kg
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <form onSubmit={onSubmit} className="space-y-4 rounded-[30px] border border-white/10 bg-white/[0.03] p-6 md:p-7">
+                <form onSubmit={onSubmit} className="min-w-0 space-y-4 rounded-[24px] border border-white/10 bg-white/[0.03] p-4 sm:rounded-[30px] sm:p-6 md:p-7">
                   <div>
-                    <div className="text-[10px] uppercase tracking-[0.34em] text-red-300/70">Checkout Node</div>
-                    <h4 className="mt-2 text-2xl font-black uppercase tracking-[0.18em] text-white">
+                    <div className="text-[10px] uppercase tracking-[0.22em] text-red-300/70 sm:tracking-[0.34em]">Checkout Node</div>
+                    <h4 className="mt-2 break-words text-xl font-black uppercase tracking-[0.12em] text-white sm:text-2xl sm:tracking-[0.18em]">
                       Finalize Order
                     </h4>
                   </div>
@@ -386,18 +380,18 @@ const PremiumCartModal = () => {
                   <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Град / Адрес" className="w-full rounded-xl border border-white/10 bg-[#040404] p-4 text-white outline-none transition-all placeholder:text-gray-600 focus:border-red-500 focus:shadow-[0_0_20px_rgba(239,68,68,0.25)]" />
                   {errors.address && <p className="text-xs text-red-500">{errors.address}</p>}
 
-                  <div className="grid grid-cols-2 gap-3 pt-2">
-                    <button type="button" onClick={() => setPaymentType("cod")} className={`rounded-xl border p-4 text-xs font-bold uppercase tracking-widest transition-all ${paymentType === "cod" ? "border-red-500 bg-red-600/10 text-red-400" : "border-white/10 bg-white/[0.02] text-gray-400"}`}>
+                  <div className="grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2">
+                    <button type="button" onClick={() => setPaymentType("cod")} className={`min-h-[48px] rounded-xl border p-4 text-xs font-bold uppercase leading-tight tracking-widest transition-all ${paymentType === "cod" ? "border-red-500 bg-red-600/10 text-red-400" : "border-white/10 bg-white/[0.02] text-gray-400"}`}>
                       Наложен платеж
                     </button>
-                    <button type="button" onClick={() => setPaymentType("card")} className={`rounded-xl border p-4 text-xs font-bold uppercase tracking-widest transition-all ${paymentType === "card" ? "border-red-500 bg-red-600/10 text-red-400" : "border-white/10 bg-white/[0.02] text-gray-400"}`}>
+                    <button type="button" onClick={() => setPaymentType("card")} className={`min-h-[48px] rounded-xl border p-4 text-xs font-bold uppercase leading-tight tracking-widest transition-all ${paymentType === "card" ? "border-red-500 bg-red-600/10 text-red-400" : "border-white/10 bg-white/[0.02] text-gray-400"}`}>
                       Карта / Портфейл
                     </button>
                   </div>
 
                   {paymentType === "card" && (
                     <div className="space-y-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                         <button type="button" className="flex h-14 items-center justify-center gap-2 rounded-xl border border-white/10 bg-[#040404] font-bold tracking-wide text-white transition-all hover:border-red-500/40">
                           <Apple size={18} /> Apple Pay
                         </button>
@@ -438,7 +432,7 @@ const PremiumCartModal = () => {
                   <button
                     type="submit"
                     disabled={isProcessing || items.length === 0}
-                    className="mt-2 flex h-14 w-full items-center justify-center gap-2 rounded-xl border border-red-500/50 bg-red-600 font-bold uppercase tracking-widest text-white shadow-[0_0_25px_rgba(239,68,68,0.35)] transition-all hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="mt-2 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl border border-red-500/50 bg-red-600 px-4 py-3 text-center text-sm font-bold uppercase leading-tight tracking-widest text-white shadow-[0_0_25px_rgba(239,68,68,0.35)] transition-all hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {isProcessing ? (
                       <>

@@ -15,7 +15,7 @@ const IntelTrackerOverlay = () => {
     }
   }, [foundIntel]);
 
-  if (pathname.startsWith("/admin")) return null;
+  if (pathname.startsWith("/admin") || pathname === "/gunsmith-3d") return null;
 
   return (
     <>

@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ShieldAlert, LogOut, Lock, Package, ImagePlus, Trash2, Upload, Pencil, X,
   LayoutDashboard, ShoppingCart, PlusCircle, Settings, User, MapPin, Plus, Minus,
   Save, CheckCircle2, Clock, Wrench, Search, RefreshCw, Eye, Phone, Mail, Hash,
-  ClipboardList, Command, Download, Shield
+  ClipboardList, Command, Download, Shield, type LucideIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -47,7 +46,7 @@ interface AuditRow {
   action: string;
   entity: string;
   entity_id: string | null;
-  meta: Record<string, any>;
+  meta: Record<string, unknown>;
 }
 
 interface SiteSetting {
@@ -57,6 +56,7 @@ interface SiteSetting {
 }
 
 type Tab = "dashboard" | "orders" | "create-order" | "arsenal" | "equipment" | "services" | "gallery" | "settings" | "audit";
+type AdminNavTab = { id: Tab; icon: LucideIcon; label: string };
 
 const PRODUCT_FIELDS = "id,title,description,price,image_url,created_at";
 const ORDER_FIELDS = "id,order_number,name,phone,email,address,total_price,status,details,is_manual,category,created_at";
@@ -68,15 +68,22 @@ const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email
 const validatePhone = (phone: string) => /^[\d\s+()-]{8,15}$/.test(phone);
 const generateOrderNumber = () => `VZ-${Math.floor(100000 + Math.random() * 900000)}`;
 const cn = (...a: Array<string | false | null | undefined>) => a.filter(Boolean).join(" ");
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null && "message" in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return "Unexpected error";
+};
 const nowFileName = (prefix: string, file: File) => {
   const ext = file.name.split(".").pop() || "png";
   return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}.${ext}`;
 };
 
 const toCSV = (rows: OrderItem[]) => {
-  const esc = (v: any) => `"${String(v ?? "").replace(/"/g, `""`)}"`;
-  const headers = ["order_number", "created_at", "name", "phone", "email", "address", "category", "status", "total_price", "is_manual", "details"];
-  const lines = [headers.map(esc).join(","), ...rows.map((r: any) => headers.map((h) => esc(r[h])).join(","))];
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, `""`)}"`;
+  const headers: Array<keyof OrderItem> = ["order_number", "created_at", "name", "phone", "email", "address", "category", "status", "total_price", "is_manual", "details"];
+  const lines = [headers.map(esc).join(","), ...rows.map((r) => headers.map((h) => esc(r[h])).join(","))];
   return lines.join("\n");
 };
 
@@ -131,13 +138,13 @@ const AdminDashboard = () => {
     return data === true;
   };
 
-  const audit = async (action: string, entity: string, entityId?: string | null, meta: Record<string, any> = {}) => {
+  const audit = async (action: string, entity: string, entityId?: string | null, meta: Record<string, unknown> = {}) => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const actor = sessionData.session?.user;
       await supabase.from("audit_logs").insert([{ actor_user_id: actor?.id ?? null, actor_email: actor?.email ?? null, action, entity, entity_id: entityId ?? null, meta }]);
     } catch {
-      // Audit logging should never block the admin action.
+      // Audit logging should not block the admin action.
     }
   };
 
@@ -209,7 +216,7 @@ const AdminDashboard = () => {
       try {
         await supabase.auth.signOut();
       } catch {
-        // Ignore sign-out failures during auth cleanup.
+        // Best-effort cleanup during auth recovery.
       }
     };
 
@@ -370,7 +377,7 @@ const AdminDashboard = () => {
         const bucket = (table === "gallery" || table === "services") ? "gallery" : "arsenal";
         finalUrl = await uploadToBucket(bucket, imageFile, table);
       }
-      const payload: Record<string, any> = { title };
+      const payload: Record<string, string> = { title };
       if (table !== "gallery") payload.description = description;
       if (table === "arsenal" || table === "equipment") payload.price = cleanPrice;
       if (table !== "services") payload.image_url = finalUrl;
@@ -383,7 +390,7 @@ const AdminDashboard = () => {
         await audit(`${table}.create`, table, data?.id, { title });
       }
       toast.success("Успешно запазено!", { id: tId }); cancelEdit(); fetchData();
-    } catch (err: any) { toast.error(err.message, { id: tId }); } finally { setIsUploading(false); }
+    } catch (err: unknown) { toast.error(getErrorMessage(err), { id: tId }); } finally { setIsUploading(false); }
   };
 
   const handleDeleteEntity = async (id: string, table: string) => {
@@ -401,7 +408,7 @@ const AdminDashboard = () => {
       if (data) await supabase.from("site_settings").update({ value: finalUrl }).eq("key", "services_main_image");
       else await supabase.from("site_settings").insert([{ key: "services_main_image", value: finalUrl, description: "Главна снимка Сервиз" }]);
       toast.success("Обновена!", { id: tId }); setServiceMainPreviewUrl(finalUrl); setServiceMainImageFile(null); fetchData();
-    } catch (err: any) { toast.error(err.message, { id: tId }); } finally { setIsUploading(false); }
+    } catch (err: unknown) { toast.error(getErrorMessage(err), { id: tId }); } finally { setIsUploading(false); }
   };
   const handleSettingImageUpload = async (file: File, settingKey: string) => {
     setIsUploading(true);
@@ -419,8 +426,8 @@ const AdminDashboard = () => {
       setSettings((prev) => prev.map((s) => s.key === settingKey ? { ...s, value: finalUrl } : s));
       toast.success("Обновена!", { id: tId });
       fetchData();
-    } catch (err: any) {
-      toast.error(err.message, { id: tId });
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err), { id: tId });
     } finally {
       setIsUploading(false);
     }
@@ -461,8 +468,8 @@ const AdminDashboard = () => {
 
       toast.success("Сайтът е обновен!", { id: tId });
       fetchData();
-    } catch (err: any) {
-      toast.error(err.message, { id: tId, duration: 5000 });
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err), { id: tId, duration: 5000 });
     }
   };
 
@@ -496,7 +503,7 @@ const AdminDashboard = () => {
     );
   }
 
-  const StatCard = ({ label, count, icon: Icon, accent }: { label: string, count: string | number, icon: any, accent: string }) => (
+  const StatCard = ({ label, count, icon: Icon, accent }: { label: string, count: string | number, icon: LucideIcon, accent: string }) => (
     <div className={cn("bg-[#0a0a0a] border border-[#1a1a1a] p-8 rounded-3xl border-t-4 hover:bg-[#111] transition-all shadow-lg", accent)}>
       <div className="flex justify-between items-start"><h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest">{label}</h3><Icon size={24} className="text-gray-400" /></div>
       <p className="text-5xl font-bold text-white mt-6">{count}</p>
@@ -528,11 +535,11 @@ const AdminDashboard = () => {
         </div>
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
           <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-4 px-4 mt-2">Главно Меню</div>
-          {[ { id: "dashboard", icon: LayoutDashboard, label: "Табло" }, { id: "orders", icon: ShoppingCart, label: "Поръчки" }, { id: "create-order", icon: PlusCircle, label: "Нова Поръчка" } ].map((tab: any) => (
+          {([ { id: "dashboard", icon: LayoutDashboard, label: "Табло" }, { id: "orders", icon: ShoppingCart, label: "Поръчки" }, { id: "create-order", icon: PlusCircle, label: "Нова Поръчка" } ] satisfies AdminNavTab[]).map((tab) => (
             <button key={tab.id} onClick={() => {setActiveTab(tab.id as Tab); cancelEdit();}} className={cn("w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all", activeTab === tab.id ? "bg-red-600 text-white shadow-[0_0_20px_rgba(220,38,38,0.3)] translate-x-1" : "text-gray-500 hover:bg-[#111] hover:text-white")}><tab.icon size={20} /> {tab.label}</button>
           ))}
           <div className="text-[10px] text-gray-600 font-bold uppercase tracking-widest mb-4 mt-8 px-4">Сайт Управление</div>
-          {[ { id: "arsenal", icon: Package, label: "Арсенал" }, { id: "equipment", icon: Shield, label: "Екипировка" }, { id: "services", icon: Wrench, label: "Сервиз & Услуги" }, { id: "gallery", icon: ImagePlus, label: "Галерия" }, { id: "settings", icon: Settings, label: "CMS Настройки" }, { id: "audit", icon: ClipboardList, label: "Дневник (Audit)" } ].map((tab: any) => (
+          {([ { id: "arsenal", icon: Package, label: "Арсенал" }, { id: "equipment", icon: Shield, label: "Екипировка" }, { id: "services", icon: Wrench, label: "Сервиз & Услуги" }, { id: "gallery", icon: ImagePlus, label: "Галерия" }, { id: "settings", icon: Settings, label: "CMS Настройки" }, { id: "audit", icon: ClipboardList, label: "Дневник (Audit)" } ] satisfies AdminNavTab[]).map((tab) => (
             <button key={tab.id} onClick={() => {setActiveTab(tab.id as Tab); cancelEdit();}} className={cn("w-full flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all", activeTab === tab.id ? "bg-[#1a1a1a] text-white border border-[#333]" : "text-gray-500 hover:bg-[#111] hover:text-white")}><tab.icon size={20} className={activeTab===tab.id?"text-red-500":""} /> {tab.label}</button>
           ))}
         </nav>
