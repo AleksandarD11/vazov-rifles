@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO: replace https://vazovrifles.bg with the final production domain before launch if different. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://vazov-rifles123.vercel.app/</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://vazov-rifles123.vercel.app/gunsmith-3d</loc>
-    <lastmod>2026-05-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  <url><loc>https://vazovrifles.bg/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://vazovrifles.bg/custom-builds</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vazovrifles.bg/service</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vazovrifles.bg/contact</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://vazovrifles.bg/inventory</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://vazovrifles.bg/terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/privacy-policy</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/returns</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/delivery-payment</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/warranty</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/service-terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/custom-order-terms</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://vazovrifles.bg/gunsmith-3d</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
 </urlset>

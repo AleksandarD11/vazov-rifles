@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://vazov-rifles123.vercel.app/sitemap.xml
+Sitemap: https://vazovrifles.bg/sitemap.xml

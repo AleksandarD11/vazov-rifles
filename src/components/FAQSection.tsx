@@ -1,31 +1,5 @@
 import { HelpCircle } from "lucide-react";
-
-const faqs = [
-  {
-    question: "Колко време отнема сервизът?",
-    answer: "Зависи от сложността на проекта и наличността на частите. След заявка получаваш конкретна информация за следващите стъпки.",
-  },
-  {
-    question: "Работите ли с части на клиента?",
-    answer: "Да, когато частите са подходящи за конкретната реплика. Преди монтаж се уточнява съвместимостта и очакваният резултат.",
-  },
-  {
-    question: "Може ли да се направи custom конфигурация?",
-    answer: "Да. Описваш целта на сетъпа, а ние предлагаме конфигурация според стил на игра, бюджет и наличност.",
-  },
-  {
-    question: "Има ли гаранция след сервиз?",
-    answer: "Всеки проект се уточнява индивидуално. След заявка получаваш ясна информация какво включва услугата и как се тества сетъпът.",
-  },
-  {
-    question: "Как става доставката?",
-    answer: "Доставката и предаването се уточняват при потвърждение на поръчката, според адреса и типа продукт или услуга.",
-  },
-  {
-    question: "Как да направя поръчка?",
-    answer: "Избери продукт или услуга, добави детайли към заявката и изпрати контакт. След това ще получиш консултация и оферта.",
-  },
-];
+import { faqs } from "@/lib/faq";
 
 const FAQSection = () => {
   return (
@@ -43,7 +17,7 @@ const FAQSection = () => {
 
         <div className="mx-auto grid max-w-5xl grid-cols-1 gap-4 lg:grid-cols-2">
           {faqs.map((item) => (
-            <details key={item.question} className="group min-w-0 rounded-3xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-xl open:border-red-500/30 open:bg-red-600/10 sm:p-6">
+            <details key={item.question} className="group min-w-0 rounded-2xl border border-white/10 bg-white/[0.035] p-5 backdrop-blur-xl open:border-red-500/30 open:bg-red-600/10 sm:p-6">
               <summary className="cursor-pointer list-none text-base font-black uppercase leading-tight tracking-[0.08em] text-white marker:hidden">
                 <span className="flex items-center justify-between gap-4">
                   {item.question}

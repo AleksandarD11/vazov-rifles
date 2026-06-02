@@ -7,12 +7,12 @@ import { useCartStore } from "@/store/useCartStore";
 import { useUiStore } from "@/store/useUiStore";
 
 const navLinks = [
-  { name: "НАЧАЛО", href: "#home" },
-  { name: "АРСЕНАЛ", href: "#arsenal" },
-  { name: "ЕКИПИРОВКА", href: "#equipment" },
-  { name: "ТУНИНГ", href: "#tuning" },
-  { name: "В ДЕЙСТВИЕ", href: "#action" },
-  { name: "КОНТАКТИ", href: "#contacts" },
+  { name: "Начало", to: "/#home" },
+  { name: "Услуги", to: "/#services" },
+  { name: "Наличности", to: "/inventory" },
+  { name: "Custom", to: "/custom-builds" },
+  { name: "Сервиз", to: "/service" },
+  { name: "Контакт", to: "/contact" },
 ];
 
 const Navbar = () => {
@@ -30,14 +30,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollTo = (href: string) => {
-    setIsOpen(false);
-    const el = document.querySelector(href);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   const handleOpenCart = () => {
     playClickSound();
     setCartOpen(true);
@@ -50,33 +42,35 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 z-50 w-full transition-all duration-500 ${
-        isScrolled
-          ? "border-b border-white/10 bg-[#040404]/90 backdrop-blur-md shadow-2xl"
-          : "bg-transparent"
+      className={`fixed left-0 top-0 z-50 w-full transition-all duration-500 ${
+        isScrolled ? "border-b border-white/10 bg-[#040404]/90 shadow-2xl backdrop-blur-md" : "bg-transparent"
       }`}
     >
       <div className="flex w-full items-center justify-between gap-3 px-4 py-3 sm:px-6 xl:py-4">
-        <button
-          type="button"
-          onClick={() => scrollTo("#home")}
-          className="shrink-0 whitespace-nowrap text-left font-display text-xl font-black tracking-widest text-white transition-colors group sm:text-2xl"
+        <Link
+          to="/"
+          className="inline-flex shrink-0 items-center rounded-md transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#040404]"
+          aria-label="Vazov Rifles home"
         >
-          <span>VAZOV </span>
-          <span className="text-red-600 group-hover:text-red-500">RIFLES</span>
-        </button>
+          <img
+            src="/brand/vazov-header-logo-transparent.png"
+            alt="Vazov Rifles logo"
+            width={175}
+            height={77}
+            className="h-auto max-h-[64px] w-[125px] object-contain sm:w-[150px] lg:w-[175px]"
+          />
+        </Link>
 
         <div className="hidden items-center gap-5 min-[1400px]:flex 2xl:gap-6">
           {navLinks.map((link) => (
-            <button
+            <Link
               key={link.name}
-              type="button"
-              onClick={() => scrollTo(link.href)}
+              to={link.to}
               onMouseEnter={playHoverSound}
               className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-gray-300 transition-colors hover:text-white"
             >
               {link.name}
-            </button>
+            </Link>
           ))}
 
           <Link
@@ -84,7 +78,7 @@ const Navbar = () => {
             onMouseEnter={playHoverSound}
             className="whitespace-nowrap text-sm font-bold uppercase tracking-widest text-gray-300 transition-colors hover:text-white"
           >
-            3D ОРЪЖЕЙНИК
+            3D конфигуратор
           </Link>
         </div>
 
@@ -121,11 +115,11 @@ const Navbar = () => {
           </button>
 
           <Button
-            onClick={handleOpenCart}
+            asChild
             onMouseEnter={playHoverSound}
             className="hidden min-h-[44px] whitespace-nowrap rounded-xl border border-red-500/50 bg-red-600 px-4 py-3 text-xs font-bold uppercase tracking-widest text-white transition-all hover:bg-red-500 min-[1400px]:inline-flex 2xl:px-5 2xl:py-4 2xl:text-sm"
           >
-            НАПРАВИ ПОРЪЧКА
+            <Link to="/contact">Запитване</Link>
           </Button>
 
           <button
@@ -146,35 +140,24 @@ const Navbar = () => {
       >
         {isOpen && (
           <div className="flex flex-col gap-3">
-            {navLinks.map((link) => (
-              <button
+            {[...navLinks, { name: "3D конфигуратор", to: "/gunsmith-3d" }].map((link) => (
+              <Link
                 key={link.name}
-                type="button"
-                onClick={() => scrollTo(link.href)}
+                to={link.to}
+                onClick={() => setIsOpen(false)}
                 onMouseEnter={playHoverSound}
-                className="min-h-[44px] whitespace-normal break-words text-left text-sm font-bold uppercase leading-tight tracking-widest text-gray-300 transition-colors hover:text-white"
+                className="min-h-[44px] whitespace-normal break-words text-sm font-bold uppercase leading-tight tracking-widest text-gray-300 transition-colors hover:text-white"
               >
                 {link.name}
-              </button>
+              </Link>
             ))}
-
-            <Link
-              to="/gunsmith-3d"
-              onClick={() => setIsOpen(false)}
-              onMouseEnter={playHoverSound}
-              className="min-h-[44px] whitespace-normal break-words text-sm font-bold uppercase leading-tight tracking-widest text-gray-300 transition-colors hover:text-white"
-            >
-              3D ОРЪЖЕЙНИК
-            </Link>
 
             <button
               type="button"
               onClick={handleToggleNightVision}
               onMouseEnter={playHoverSound}
               className={`inline-flex min-h-[44px] w-fit items-center gap-2 rounded-xl border px-4 py-2 text-xs font-bold uppercase tracking-[0.28em] transition-all ${
-                isNightVisionActive
-                  ? "border-green-300/40 bg-green-500/15 text-green-100"
-                  : "border-white/10 bg-white/[0.03] text-gray-300"
+                isNightVisionActive ? "border-green-300/40 bg-green-500/15 text-green-100" : "border-white/10 bg-white/[0.03] text-gray-300"
               }`}
               aria-label="Toggle night vision mode"
               aria-pressed={isNightVisionActive}
@@ -182,17 +165,6 @@ const Navbar = () => {
               <Eye size={16} />
               NVG
             </button>
-
-            <Button
-              onClick={() => {
-                setIsOpen(false);
-                handleOpenCart();
-              }}
-              onMouseEnter={playHoverSound}
-              className="min-h-[48px] w-full whitespace-normal rounded-xl border border-red-500/50 bg-red-600 py-4 text-sm font-bold uppercase leading-tight tracking-widest text-white hover:bg-red-500"
-            >
-              НАПРАВИ ПОРЪЧКА
-            </Button>
           </div>
         )}
       </div>
